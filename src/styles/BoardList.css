@@ -1,0 +1,96 @@
+/* 전체 페이지 최소 높이 설정 */
+body, .board-list-container {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  margin-bottom: -200px;
+}
+
+/* 테이블 스타일 */
+.board-table {
+  width: 60vw;
+  max-width: 2000px;
+  margin: 50px auto;
+  border-collapse: collapse;
+}
+
+/* 테이블 헤더 스타일 (열 구분선 유지) */
+.board-table th {
+  background-color:  #003f66;  /* 진한 파란색 */
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  border-bottom: 2px solid  #003f66; /* 헤더 아래쪽 구분선 */
+  border-right: 1px solid white; /* 헤더 세로줄 유지 */
+}
+
+/* 헤더 마지막 열의 오른쪽 테두리 제거 */
+.board-table th:last-child {
+  border-right: none;
+}
+
+/* 테이블 본문 스타일 (세로줄 제거, 가로줄만 유지) */
+.board-table td {
+  padding: 12px;
+  text-align: center;
+  height: 40px;
+  border-top: 1px solid #ccc; /* 각 행 위쪽에 가로줄 추가 */
+  border-right: none; /* 세로줄 제거 */
+}
+
+/* 게시글 제목 링크 스타일 */
+.post-link {
+  text-decoration: none;
+  color:  #003f66;
+  font-weight: bold;
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+  
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: -20px;
+}
+
+.pagination span {
+  margin: 0 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.page-number {
+  margin: 0 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color:  #003f66;
+}
+
+.page-number.active {
+  text-decoration: underline;
+}
+
+/* 제목 (h2) 왼쪽 정렬 & 화면 끝까지 가지 않도록 수정 */
+.board-list-container h2 {
+  margin: 0 auto;
+  text-align: left;
+  font-size: 40px;
+  font-weight: bold;
+  color:  #003f66;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  width: 60vw;  /* 테이블과 동일한 너비 */
+  max-width: 2000px;
+}
+
+/* 수평선 스타일 (화면 끝까지 가지 않도록 수정) */
+.board-list-container hr {
+  margin-top: 20px;
+  border: none;
+  border-top: 2px solid  #003f66;
+  width: 60vw;  /* 테이블과 동일한 너비 */
+  max-width: 2000px;
+  margin: 0 auto 50px auto; /* 가운데 정렬 */
+}
+
+

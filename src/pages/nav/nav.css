@@ -1,0 +1,138 @@
+/* 전체적인 설정 */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  color: white; /* 텍스트 색상 흰색 */
+  font-size: 20px;
+  padding: 10px 20px; /* 좌우 여백 */
+  background-color: #003f66; /* 배경 색상 */
+  width: 100%; /* 부모 요소의 전체 너비를 차지 */
+  justify-content: right;
+}
+
+.nav-user span, .nav-user i {
+  cursor: pointer; /* 클릭 가능한 요소에 커서 포인터 추가 */
+}
+
+/* 사용자 아이콘 */
+.nav-user i {
+  font-size: 40px;
+  margin-right: 50px;
+}
+
+/* 기본 설정 (큰 화면) */
+.nav-logo {
+  font-size: 50px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  margin-top: 30px;
+  margin-left: 30px;
+  margin-bottom: -30PX;
+  justify-content: center;
+}
+
+.nav-logo .highlight {
+  font-size: 75px;
+  color: #003f66;
+  margin-left: 5px;
+}
+
+/* 네비게이션 바 */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  margin-left: 480px;
+  }
+  
+  /* 메뉴 컨테이너 */
+  .nav-item-container {
+    display: flex;
+    margin-right: 30px;
+  }
+  
+  /* 개별 메뉴 스타일 */
+  .nav-item {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+  }
+  
+/* 화면 크기가 줄어들 때 로고와 메뉴 사이의 간격 줄이기 */
+@media (max-width: 1024px) {
+  .nav-logo {
+    margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
+  }
+
+  .nav-menu {
+    margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
+  }
+}
+
+  /* 서브메뉴 스타일 */
+  .submenu {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%); /* 정확한 가운데 정렬 */
+    background-color: white;
+    color: black;
+    box-shadow: 0 10px 10px rgba(0, 0.1, 0.1, 0.1);
+    min-width: 150px;
+    padding: 10px 0;
+    z-index: 1; /* 메뉴가 다른 요소 위에 나타나도록 */
+    transition: opacity 0.5s ease, visibility 0s 0.5s; /* opacity와 visibility를 함께 조절 */
+  }
+  
+  /* 서브메뉴 버튼 스타일 */
+  .submenu button {
+    text-align: left;
+    display: block;
+    width: 200px;
+    height: 80px;
+    background: none;
+    border: none;
+    padding: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .submenu button:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* 메뉴 항목에 마우스를 올리면 해당 서브메뉴만 보이도록 */
+  .nav-item-container:hover .submenu {
+    opacity: 1; 
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0s 0s; /* 사라지는 시간 동안 visibility 변경 없이 opacity만 조절 */
+  }
+  
+  .nav-item-container {
+    position: relative;
+  }
+  
+  /* 사용자 메뉴 항목 */
+  .nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+
+  
+
+
+

@@ -1,0 +1,174 @@
+/* 전체 컨테이너 */
+.mypage-container {
+  width: 60vw;
+  max-width: 800px;
+  margin: 50px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: fle;
+  position: relative; /* 버튼 위치 조정을 위한 기준 */
+}
+
+/* 제목 (h2) 왼쪽 상단 정렬 */
+.mypage-container h2 {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-size: 40px;
+  font-weight: bold;
+  color: #003f66;
+  margin-bottom: 0px;
+  width: 100%;
+}
+
+/* 수평선 스타일 */
+.mypage-container hr {
+  margin-top: 10px;
+  border: none;
+  border-top: 2px solid #003f66;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+/* 입력 필드 컨테이너 */
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px 0;
+}
+
+/* 라벨 스타일 */
+.input-group label {
+  width: 150px;
+  font-size: 18px;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* 입력 필드 스타일 */
+.input-group input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #003f66;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* 버튼 컨테이너 - 오른쪽 정렬 */
+.btn1 {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 10px; /* 버튼 간격 */
+  margin-top: 30px; /* 상단 여백 */
+  float:right;/* 부모 컨테이너에서 오른쪽 끝으로 이동 */
+}
+
+/* 버튼 공통 스타일 - 크기 및 정렬 통일 */
+.submit-btn1, .submit-btn2 {
+  width: 140px; /* 버튼 너비 */
+  height: 50px; /* 버튼 높이 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; /* 글씨 크기 */
+  font-weight: bold;
+  line-height: 1; /* 줄 간격 고정 */
+  padding: 0; /* 내부 여백 제거 */
+  border: none; /* 테두리 제거 */
+  cursor: pointer; /* 클릭 가능한 포인터 */
+  border-radius: 10px; /* 둥근 모서리 */
+  box-sizing: border-box; /* 여백 및 패딩 포함 */
+
+}
+
+/* 버튼 호버 효과 */
+.submit-btn1:hover, .submit-btn2:hover {
+  opacity: 0.8; /* 마우스 오버 시 투명도 변경 */
+}
+
+/* 탈퇴 버튼 (배경 색상만 다르게 설정) */
+.submit-btn1 {
+  background-color: #646464; /* 탈퇴 버튼 색상 */
+  color: white; /* 글씨 색상 */
+}
+
+/* 수정 버튼 (배경 색상만 다르게 설정) */
+.submit-btn2 {
+  background-color: #003f66; /* 수정 버튼 색상 */
+  color: white; /* 글씨 색상 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .mypage-container {
+    width: 70vw;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input-group input {
+    width: 100%;
+  }
+
+  .btn1 {
+    justify-content: center; /* 화면이 작아지면 가운데 정렬 */
+  }
+
+  .submit-btn1, .submit-btn2 {
+    width: 160px; /* 버튼 크기 조정 */
+  }
+}
+
+@media (max-width: 768px) {
+  .mypage-container {
+    width: 80vw;
+  }
+
+  .btn1 {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .submit-btn1, .submit-btn2 {
+    width: 180px; /* 버튼 크기 조정 */
+  }
+}
+
+@media (max-width: 480px) {
+  .mypage-container {
+    width: 90vw;
+  }
+
+  .btn1 {
+    width: 100%;
+    justify-content: center; /* 작은 화면에서는 가운데 정렬 */
+  }
+
+  .submit-btn1, .submit-btn2 {
+    width: 100%; /* 버튼 크기 조정 */
+  }
+}
+
+/* signup-link 클래스 스타일: 작성한 글 목록 링크 */
+.signup-link {
+  margin-top: -50px;
+  margin-left: 550px
+}
+
+.list {
+ margin-top: 50px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: bold;
+}

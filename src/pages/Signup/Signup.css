@@ -1,0 +1,150 @@
+/* 전체 컨테이너 */
+.signup-container {
+  width: 60vw;  /* 뷰포트 너비의 60% */
+  max-width: 800px;  /* 최대 너비를 800px로 설정 */
+  margin: 50px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;  /* flexbox 사용 */
+  flex-direction: column;  /* 세로로 정렬 */
+  align-items: center;  /* 자식 요소를 가로로 중앙 정렬 */
+}
+
+.signup-title {
+  font-size: 50px;  /* 제목 크기 더 증가 */
+  font-weight: 700;
+  margin-bottom: 30px;  /* 간격 더 증가 */
+  display: flex;
+  align-items: center;
+  margin-left: 15px;  /* 제목 왼쪽 여백 더 증가 */
+}
+
+.signup-highlight {
+  color: #003f66;
+  font-size: 70px;  /* 하이라이트 크기 더 증가 */
+}
+
+/* 탭 버튼 컨테이너 */
+.signup-buttons {
+  display: flex;
+  justify-content: center;
+  border: 1px solid #000;
+  font-weight: bolder;
+  width: 120%;
+}
+
+/* 탭 버튼 기본 스타일 */
+.signup-buttons button {
+  flex: 1;
+  padding: 20px 35px;
+  border: none;
+  background-color: white;
+  font-size: 22px;
+  font-weight: bolder;
+  cursor: pointer;
+  border-right: 1px solid #000;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 0;
+ 
+}
+
+/* 마지막 버튼의 우측 테두리 제거 */
+.signup-buttons button:last-child {
+  border-right: none;
+}
+
+/* 활성화된 탭 버튼 (선택된 버튼) */
+.signup-buttons .active {
+  background-color:  #003f66;
+  color: white;
+  font-weight: bold;
+}
+
+/* 비활성화된 탭 버튼 */
+.signup-buttons button:not(.active) {
+  background-color: white;
+  color: black;
+}
+/* 입력 필드 컨테이너 */
+.input-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;  /* 왼쪽 정렬 */
+  margin: 20px 0;
+  padding: 15px;
+  gap: 40px;  /* 아이디 입력 필드와 중복확인 버튼 사이의 간격을 40px로 넓힘 */
+}
+
+/* 라벨 스타일 (첫 글자 맞추기) */
+.input-container label {
+  width: 150px;  /* 각 라벨의 너비 고정 (첫 글자가 맞춰짐) */
+  font-size: 18px;
+  text-align: left;  /* 첫 번째 글자에 맞춰 왼쪽 정렬 */
+  margin-right: 15px;  /* 라벨과 입력 필드 사이에 간격 추가 */
+  font-weight: bold;  /* 라벨을 굵게 표시 */
+}
+
+/* 입력 필드 스타일 */
+.input-container input {
+  width: 75%;
+  padding: 12px;
+  border: 1px solid #003f66;
+  border-radius: 5px;
+  font-size: 18px;
+  margin-right: 0;  /* 아이디 인풋 상자 뒤에 추가된 간격 제거 */
+}
+
+/* 중복확인 버튼 */
+.input-container button {
+  padding: 10px 15px;
+  background-color: #003f66;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  width: 130px;
+  /* margin-left: 20px; */
+  margin-right: -150px;
+  height: 45px;
+}
+
+.input-container button:hover {
+  background-color: #094f6c;
+}
+
+/* 가입 버튼 */
+.submit {
+  width: 140px;
+  height: 50px;  /* 고정된 높이 */
+  padding: 12px 20px;  /* 고정된 패딩 */
+  background-color:  #003f66;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 25px;
+  text-align: center;
+  display: inline-block;
+  position: relative;  /* 상대 위치 설정 */
+  left: 0;  /* 기본 위치에서 왼쪽으로 이동 */
+  border-radius: 5px;
+  
+}
+
+/* 에러 메시지 */
+.error-msg {
+  color: red;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.success-msg {
+  color: green;
+  font-size: 16px;
+  margin-top: 10px;
+}
+

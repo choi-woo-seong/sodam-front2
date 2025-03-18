@@ -1,0 +1,110 @@
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  min-height: 70vh;
+  width: 80%;
+}
+
+.register-content {
+  width: 60%;
+  text-align: left;
+}
+
+/* 🔹 제목 스타일 */
+.register-container h2 {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-size: 40px; /* 기존 detail-title과 동일한 크기 */
+  font-weight: bold;
+  color: #003f66;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+/* 🔹 구분선 스타일 */
+.register-container hr {
+  margin-top: 20px;
+  border: none;
+  border-top: 2px solid #003f66;
+  width: 110%;
+  margin-left: -50px;
+  margin-bottom: 50px;
+}
+
+/* 🔹 입력 칸 스타일 */
+.register-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🔹 입력칸 간격 추가 */
+.register-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.register-label {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+/* 🔹 입력 필드 스타일 */
+.register-text {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #D3D3D3;
+  outline: none;
+  font-size: 18px;
+  border-radius: 5px;
+}
+
+/* 🔹 설명 입력 칸 크기 조정 */
+.register-text.large {
+  height: 200px;
+  resize: none;
+}
+
+/* 🔹 버튼 스타일 */
+.register-submit {
+  display: block;
+  margin-left: auto;
+  margin-right: -30px;
+  margin-top: 50px;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #003f5c;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+}
+
+.register-submit:hover {
+  background-color: #002a42;
+}
+
+ /* 삭제 버튼 스타일 */
+ .register-submit.delete-btn{
+  display: block;
+  margin-left: auto;
+  margin-right: 80px;
+  margin-top: -50px;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #646464;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+ }
