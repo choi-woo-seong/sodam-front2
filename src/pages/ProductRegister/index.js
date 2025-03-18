@@ -1,18 +1,8 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
-  // 중복확인 함수
-  const handleDuplicateCheck = () => {
-    fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.p_title}`)
-      .then(response => response.json())
-      .then(data => {
-        // 처리 내용
-      })
-      .catch(error => {
-        console.error("중복 확인 오류 발생:", error);
-      });
-  };
-
+  const navigate = useNavigate();
   // 상품 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     p_title: "",
@@ -23,6 +13,8 @@ const ProductRegister = () => {
 
   // 오류 메시지 상태
   const [errors, setErrors] = useState({});
+
+  const [message, setMessage] = useState({});
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
@@ -40,7 +32,7 @@ const ProductRegister = () => {
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {};        
 
     // 제목 유효성 검사
     if (!formData.p_title) {
@@ -72,6 +64,40 @@ const ProductRegister = () => {
 
     return Object.keys(newErrors).length === 0;
   };
+
+  const handleProductInsert = async (e) => {
+    e.preventDefault();
+    console.log(formData)
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+        method: "POST",
+        headers: {
+          "Authorization" : `Bearer ${token}`,// JWT 토큰 포함
+          "Content-Type" : "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("상품 등록에 실패했습니다.");
+      }
+
+      setMessage("상품이 성공적으로 등록되었습니다.");
+      setFormData({ p_title: "", p_price: "", p_contents: "", p_link: "" }); // 입력값 초기화
+      navigate("/productBoardList")
+    } catch (error) {
+      setErrors(error.message);
+      console.error("상품 등록 오류:", errors);
+    }
+  };
+
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = (e) => {
@@ -107,7 +133,7 @@ const ProductRegister = () => {
           <div className="register-row">
             <div className="register-label">금액</div>
             <input
-              type="number"
+              type="text"
               className="register-text"
               name="p_price"
               id="p_price"
@@ -146,8 +172,7 @@ const ProductRegister = () => {
         </div>
 
         {/* 제출 버튼 */}
-        <button className="register-submit" type="submit" 
-         onClick={handleDuplicateCheck} >
+        <button className="register-submit" type="button" onClick={handleProductInsert} >
           등록
         </button>
       </div>
