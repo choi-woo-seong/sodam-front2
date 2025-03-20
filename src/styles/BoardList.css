@@ -1,10 +1,9 @@
 /* 전체 페이지 최소 높이 설정 */
-body, .board-list-container {
+.board-list-container {
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  margin-bottom: -200px;
+  margin-bottom: -250px;
 }
+
 
 /* 테이블 스타일 */
 .board-table {
@@ -77,10 +76,10 @@ body, .board-list-container {
   font-size: 40px;
   font-weight: bold;
   color:  #003f66;
-  margin-top: 50px;
+  margin-top: 100px;
   margin-bottom: 20px;
   width: 60vw;  /* 테이블과 동일한 너비 */
-  max-width: 2000px;
+
 }
 
 /* 수평선 스타일 (화면 끝까지 가지 않도록 수정) */
@@ -88,9 +87,23 @@ body, .board-list-container {
   margin-top: 20px;
   border: none;
   border-top: 2px solid  #003f66;
-  width: 60vw;  /* 테이블과 동일한 너비 */
+  width:65%;  /* 테이블과 동일한 너비 */
   max-width: 2000px;
   margin: 0 auto 50px auto; /* 가운데 정렬 */
+}
+.list-btn{
+  display: block;
+  margin-left: auto;
+  margin-right: 360px;
+  margin-top: 50px;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #003f5c;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
 }
 
 

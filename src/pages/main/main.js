@@ -174,7 +174,7 @@ useEffect(() => {
           <div className="recent-cards">
             {/* 상품 카드 */}
             <div className="card">
-              <div className="card-header">
+              <div className="card-header" onClick={() => navigate('/productBoardList')}>
                 상품
                 <button className="expand-icon" onClick={() => navigate('/productBoardList')}>
                   +
@@ -191,7 +191,7 @@ useEffect(() => {
 
             {/* 비즈니스 카드 */}
             <div className="card">
-              <div className="card-header">
+              <div className="card-header"  onClick={() => navigate('/businessBoardList')}>
                 비즈니스
                 <button className="expand-icon" onClick={() => navigate('/businessBoardList')}>
                   +
@@ -208,7 +208,7 @@ useEffect(() => {
 
             {/* 금융 카드 */}
             <div className="card wide">
-              <div className="card-header">
+              <div className="card-header"  onClick={() => navigate('/bankBoardList')}>
                 금융
                 <button className="expand-icon" onClick={() => navigate('/bankBoardList')}>
                   +
@@ -225,7 +225,7 @@ useEffect(() => {
 
             {/* 자유게시판 카드 */}
             <div className="card wide">
-              <div className="card-header">
+              <div className="card-header" onClick={() => navigate('/communityBoardList')}>
                 자유게시판
                 <button className="expand-icon" onClick={() => navigate('/communityBoardList')}>
                   +
@@ -242,8 +242,8 @@ useEffect(() => {
 
             {/* 공지 카드 */}
             <div className="card">
-              <div className="card-header">
-                공지
+              <div className="card-header" onClick={() => navigate('/noticeBoardList')}>
+                공지사항
                 <button className="expand-icon" onClick={() => navigate('/noticeBoardList')}>
                   +
                 </button>
@@ -259,7 +259,7 @@ useEffect(() => {
 
             {/* Q&A 카드 */}
             <div className="card">
-              <div className="card-header">
+              <div className="card-header" onClick={() => navigate('/QABoardList')}>
                 Q&A
                 <button className="expand-icon" onClick={() => navigate('/QABoardList')}>
                   +

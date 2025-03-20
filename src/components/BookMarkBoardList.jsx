@@ -1,20 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const BookMarkBoardList = () => {
-  const posts = [
-    { id: 1, title: "첫 번째 게시글", author: "홍길동", date: "2025-03-11" },
-    { id: 2, title: "두 번째 게시글", author: "이순신", date: "2025-03-10" },
-    { id: 3, title: "세 번째 게시글", author: "김유신", date: "2025-03-09" },
-    { id: 4, title: "네 번째 게시글", author: "강감찬", date: "2025-03-08" },
-    { id: 5, title: "다섯 번째 게시글", author: "이순신", date: "2025-03-07" },
-    { id: 6, title: "여섯 번째 게시글", author: "홍길동", date: "2025-03-06" },
-    { id: 7, title: "일곱 번째 게시글", author: "이순신", date: "2025-03-05" },
-    { id: 8, title: "여덟 번째 게시글", author: "김유신", date: "2025-03-04" },
-    { id: 9, title: "아홉 번째 게시글", author: "강감찬", date: "2025-03-03" },
-    { id: 10, title: "열 번째 게시글", author: "홍길동", date: "2025-03-02" },
-  ];
+const [data, setData] = useState([]);
+  const [errors, setErrors] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+
+        if (!token) {
+          setMessage("로그인이 필요합니다.");
+          return;
+        }
+
+        const response = await fetch("http://192.168.0.102:8080/api/products/searchAll", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("상품 조회에 실패했습니다.");
+        }
+
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        setErrors(error.message);
+        console.error("상품 조회 오류:", error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log("🔍 데이터 상태 변화:", data);
+  }, [data]);
 
   // 현재 페이지를 관리하는 state
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,10 +50,10 @@ const BookMarkBoardList = () => {
   // 페이지네이션에 따라 보여줄 게시글 계산
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
 
   // 총 페이지 수 계산
-  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const totalPages = Math.ceil(data.length / postsPerPage);
 
   // 페이지 번호 변경 함수
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -35,8 +62,6 @@ const BookMarkBoardList = () => {
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
 
-
-  
   // const handleBookmark = async (e) => {
   //   e.preventDefault();
   
@@ -90,18 +115,24 @@ const BookMarkBoardList = () => {
           </tr>
         </thead>
         <tbody>
-          {currentPosts.map((post, index) => (
-            <tr key={post.id}>
-              <td>{indexOfFirstPost + index + 1}</td>
-              <td>
-                <Link to={`/productDetail`} className="post-link">
-                  {post.title}
-                </Link>
-              </td>
-              <td>{post.author}</td>
-              <td>{post.date}</td>
-            </tr>
-          ))}
+          {currentPosts && currentPosts.length > 0 ? (
+                      currentPosts.map((post, index) => (
+                        <tr key={post.no}>
+                          <td>{post.no}</td>
+                          <td>
+                            <Link to={`/bookMarkBoardList/${post.no}`} className="post-link">
+                              {post.title}
+                            </Link>
+                          </td>
+                          <td>{post.username}</td>
+                          <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4">등록된 상품이 없습니다.</td>
+                      </tr>
+                    )}
         </tbody>
       </table>
 

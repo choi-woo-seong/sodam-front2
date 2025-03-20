@@ -43,7 +43,6 @@ const PersonLogin = () => {
               nPassword: formData.nPassword,
           }),
 
-            credentials: "include",
             mode: 'cors', 
         });
   
@@ -56,7 +55,6 @@ const PersonLogin = () => {
         localStorage.setItem("jwt", data.token); // 🔥 JWT 저장
         localStorage.setItem("userName", data.name); // 🔥 사용자 이름 저장
   
-        alert("로그인 성공! JWT:"+data.token + "이름:" + data.name);
         setToken(data.token);
         setUserName(data.name);
         setErrorMessage("");
@@ -64,6 +62,7 @@ const PersonLogin = () => {
   
     } catch (error) {
         console.error("로그인 오류:", error.message);
+        alert("로그인 실패!! 관리자에게 문의바랍니다.");
         setErrorMessage(error.message);
     }
   };

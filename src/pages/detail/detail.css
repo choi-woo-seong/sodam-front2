@@ -42,11 +42,17 @@
   position: relative;
 }
 
+.detail-author-date {
+margin-left: 740px;
+margin-top: -30px;
+white-space: nowrap; /* 줄바꿈 방지 */
+}
+
 /* 아이콘 스타일 */
 .bookmark-icon {
   position: absolute;
   right: 10px;
-  top: -110px; /* 📌 hr 선 위로 이동 */
+  top: -100px; /* 📌 hr 선 위로 이동 */
   font-size: 30px;
   color: gray;
   cursor: pointer;

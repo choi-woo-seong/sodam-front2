@@ -41,8 +41,10 @@ function Nav() {
 
       {/* 상단: 로고  */}
         <div className="nav-logo">
+          <div className='title-logo'>
           <span onClick={() => navigate('/main')}>소담</span>
           <span className="highlight" onClick={() => navigate('/main')}>365</span>
+          </div>
                 {/* 하단: 메뉴 바 (남색 배경) */}
       <div className="nav-menu">
         <div className="nav-item-container">

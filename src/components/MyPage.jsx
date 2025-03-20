@@ -43,7 +43,7 @@ function MyPage() {
             <h2>마이페이지</h2>
             <div className="signup-link">
                 <p className="list" onClick={() => navigate("/writeList")}>
-                <i class="fa-solid fa-list-ul"></i>작성한 글 목록</p>
+                <i class="fa-solid fa-file-pen"></i>&nbsp;작성한 글 목록</p>
             </div>
             <hr />
             <form onSubmit={handleSubmit}>

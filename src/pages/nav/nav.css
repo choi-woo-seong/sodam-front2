@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
 /* 전체적인 설정 */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+}
+
+.navbar {
+  margin-bottom: 30px
 }
 
 .nav-user {
@@ -33,16 +38,26 @@ body {
   display: flex;
   align-items: center;
   white-space: nowrap; /* 줄바꿈 방지 */
-  margin-top: 30px;
+  margin-top: 50px;
   margin-left: 30px;
   margin-bottom: -30PX;
   justify-content: center;
+  
 }
 
 .nav-logo .highlight {
   font-size: 75px;
-  color: #003f66;
+  font-weight: bold;
+  background: linear-gradient(135deg, #003f66, #007bb5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-left: 5px;
+}
+
+/* 호버 시 전체 로고에 애니메이션 효과 적용 */
+.title-logo:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 /* 네비게이션 바 */

@@ -1,14 +1,20 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const NoticeRegister = () => {
+    const navigate = useNavigate();
+  
   // 공지 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     n_title: "",
-    n_content: "",
+    n_contents: "",
   });
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
   const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState("");
+  
 
   // 중복 확인 상태
   const [isDuplicate, setIsDuplicate] = useState(false);
@@ -16,8 +22,9 @@ const NoticeRegister = () => {
   // 각 입력 필드에 대한 ref 생성
   const refs = {
     n_title: useRef(null),
-    n_content: useRef(null),
+    n_contents: useRef(null),
   };
+  
 
   // 폼의 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
@@ -53,6 +60,45 @@ const NoticeRegister = () => {
 
     return Object.keys(newErrors).length === 0;
   };
+  const handleProductInsert = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      // FormData 객체로 폼 데이터와 파일을 전송
+      const formDataToSend = new FormData();
+      formDataToSend.append("n_title", formData.n_title);
+      formDataToSend.append("n_contents", formData.n_contents);
+    
+      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`, // JWT 토큰 포함
+        },
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error("등록에 실패했습니다.");
+      }
+
+      setMessage("성공적으로 등록되었습니다.");
+      setFormData({
+        n_title: "",
+        n_contents: "",
+      });
+      navigate("/noticeBoardList");
+    } catch (error) {
+      setErrors(error.message);
+      console.error("상품 등록 오류:", error);
+    }
+  };
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e) => {
@@ -69,7 +115,7 @@ const NoticeRegister = () => {
       alert("등록 되었습니다.");
       setFormData({
         n_title: "",
-        n_content: "",
+        n_contents: "",
       });
     } else {
       alert("빈칸을 확인해주세요.");
@@ -79,7 +125,7 @@ const NoticeRegister = () => {
   return (
     <div className="register-container">
       <div className="register-content">
-        <h2>공지 등록</h2>
+        <h2>공지사항 등록</h2>
         <hr />
         <div className="register-box">
           {/* 제목 입력 */}
@@ -102,13 +148,13 @@ const NoticeRegister = () => {
             <div className="register-label">내용</div>
             <textarea
               className="register-text large"
-              name="n_content"
-              id="n_content"
-              ref={refs.n_content}
-              value={formData.n_content}
+              name="n_contents"
+              id="n_contents"
+              ref={refs.n_contents}
+              value={formData.n_contents}
               onChange={handleChange}
             />
-            {errors.n_content && <span className="error">{errors.n_content}</span>}
+            {errors.n_contents && <span className="error">{errors.n_contents}</span>}
           </div>
         </div>
 

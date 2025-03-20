@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons"; // faUser 아이콘 추가
 import "./detail.css";
 
 function CommunityDetail() {
@@ -11,45 +11,68 @@ function CommunityDetail() {
   const [c_content, setContent] = useState(""); // 게시글 내용
   const c_contents = "자유게시판"; // 실제 데이터와 연결 필요
 
+    const { id } = useParams(); // URL에서 productId 파라미터 가져오기
+  
+
   // 찜 상태 (DB 연결 전에는 localStorage 사용)
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   // 댓글을 저장할 상태
   const [isIdAvailable, setIsIdAvailable] = useState(null);
 
+    // 📌 API에서 가져오는 상품 정보
+    const [communityDetails, setCommunityDetails] = useState({
+      c_title: "제목",
+      c_contents: "설명",
+      c_name: "작성자", // 작성자 추가
+      c_createdDate: "작성일", // 작성일 추가
+    });
+
   // 1️⃣ 마운트 시 localStorage에서 찜 여부 확인
   useEffect(() => {
     const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
     setIsBookmarked(savedBookmarks.includes(c_contents));
 
-    // 댓글 목록 및 게시글 내용 불러오기 (예시로 API 요청)
-    fetch("http://192.168.0.102:8080/api/community/details") // 예시 API URL
-      .then((response) => response.json())
-      .then((data) => {
-        setTitle(data.title || "자유게시판 제목");
-        setContent(data.content || "자유게시판 내용");
-        setComments(data.comments || []);
-      })
-      .catch((error) => {
-        console.error("게시글 및 댓글 데이터 가져오기 실패:", error);
-      });
-
-    // 중복 아이디 확인 API 호출 (예시로 테스트 아이디 사용)
-    fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=testuser123`)
-      .then(response => response.json())
-      .then(data => {
-        if (data) {
-          setIsIdAvailable(false);
-          alert("이미 사용 중인 아이디입니다.");
-        } else {
-          setIsIdAvailable(true);
-          alert("사용 가능한 아이디입니다.");
+    // 상품 데이터 API 호출 (예시로 제품 정보 호출)
+    const fetchCommunityDetails = async () => {
+      try {
+        const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`); // 예시 API URL
+        if (!response.ok) {
+          throw new Error("상품 데이터 조회에 실패했습니다.");
         }
-      })
-      .catch(error => {
-        console.error("중복 확인 오류 발생:", error);
-      });
-  }, []);
+
+        const data = await response.json();
+
+        if (data) {
+          setCommunityDetails({
+            c_title: data.c_title || "상품 제목",
+            c_contents: data.c_contents || "상품 설명",
+            c_name: data.c_name || "작성자", // 작성자 데이터 추가
+            c_createdDate: data.c_createdDate || "작성일", // 작성일 데이터 추가
+          });
+        } else {
+          console.error("빈 데이터 응답:", data);
+        }
+      } catch (error) {
+        console.error("상품 데이터 가져오기 실패:", error);
+      }
+    };
+
+    fetchCommunityDetails();
+  }, [id]); // 빈 배열을 두어 페이지 로드시 한 번만 실행
+
+      // 댓글 등록 함수
+  // const handleCommentSubmit = () => {
+  //   if (answer.trim() === "") return; // 댓글이 비어있으면 등록하지 않음
+  //   const newComment = {
+  //     id: Date.now(), // 고유 ID 생성 (현재 시간)
+  //     author: "익명", // 댓글 작성자
+  //     content: answer, // 댓글 내용
+  //     date: new Date().toLocaleDateString(), // 작성 날짜
+  //   };
+  //   setComments([...a_comments, newComment]); // 댓글 목록에 추가
+  //   setComment(""); // 입력창 초기화
+  // };
 
   // 2️⃣ 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
   const handleBookmarkClick = () => {
@@ -68,19 +91,6 @@ function CommunityDetail() {
     }
   };
 
-  // 댓글 등록 함수
-  // const handleCommentSubmit = () => {
-  //   if (c_comment.trim() === "") return;
-  //   const newComment = {
-  //     id: Date.now(), 
-  //     author: "익명",
-  //     content: c_comment,
-  //     date: new Date().toLocaleDateString(),
-  //   };
-  //   setComments([...c_comments, newComment]);
-  //   setComment(""); // 입력창 초기화
-  // };
-
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
 
   // 목록 버튼 클릭 시 이동하는 함수
@@ -93,6 +103,15 @@ function CommunityDetail() {
       <div className="detail-content">
         <h2 className="detail-title">자유게시판</h2>
         <hr />
+
+         {/* 작성자 아이콘과 작성일 표시 */}
+             <div className="detail-author-date">
+               <span className="author">
+                 <FontAwesomeIcon icon={faUser} /> &nbsp;{/* 사람 아이콘 추가 */}
+                 {communityDetails.c_name}&nbsp;
+               </span>
+               <span className="created-date">작성일: {communityDetails.c_createdDate}</span>
+             </div>
 
         <div className="detail-header">
           <FontAwesomeIcon
@@ -132,6 +151,8 @@ function CommunityDetail() {
           {c_comments.map((c) => (
             <div key={c.id} className="detail-comment-card">
               <div className="detail-comment-author-date">
+                {/* 댓글 작성자 앞에 사람 아이콘 추가 */}
+                <FontAwesomeIcon icon={faUser} /> {/* 사람 아이콘 추가 */}
                 <span>{c.author}</span> | <span>{c.date}</span>
               </div>
               <div className="detail-comment-content">
@@ -169,5 +190,3 @@ function CommunityDetail() {
 }
 
 export default CommunityDetail;
-
- 

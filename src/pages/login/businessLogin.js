@@ -12,8 +12,8 @@ const BusinessLogin = () => {
 
   // 일반폼 입력 상태
   const [formData, setFormData] = useState({
-    b_userid: "",
-    b_password: "",
+    userid: "",
+    password: "",
     ownernum: "",
   });
 
@@ -23,14 +23,13 @@ const BusinessLogin = () => {
   };
 
   const refs = {
-    b_userid: useRef(null),
-    b_password: useRef(null),
+    userid: useRef(null),
+    password: useRef(null),
     ownernum: useRef(null),
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
         const response = await fetch("http://192.168.0.102:8080/auth/login/buser", {
             method: "POST",
@@ -38,7 +37,6 @@ const BusinessLogin = () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(formData),
-            credentials: "include",
             mode: 'cors', 
         });
 
@@ -51,7 +49,6 @@ const BusinessLogin = () => {
         localStorage.setItem("jwt", data.token); // 🔥 JWT 저장
         localStorage.setItem("userName", data.name); // 🔥 사용자 이름 저장
 
-        alert("로그인 성공! JWT:", data.token, "이름:", data.name);
         setToken(data.token);
         setUserName(data.name);
         setErrorMessage("");
@@ -59,6 +56,7 @@ const BusinessLogin = () => {
 
     } catch (error) {
         console.error("로그인 오류:", error.message);
+        alert("로그인 실패!! 관리자에게 문의바랍니다.");
         setErrorMessage(error.message);
     }
   };
@@ -91,9 +89,9 @@ const BusinessLogin = () => {
 
       <div className="login-form-container">
         <div className="login-input-container3">
-          <input type="text" placeholder="아이디" className="login-input-box" name="b_userid" id="b_userid" ref={refs.b_userid} value={formData.b_userid} onChange={handleChange} />
-          <input type="password" placeholder="비밀번호" className="login-input-box" name="b_password" id="b_password" ref={refs.b_password} value={formData.b_password} onChange={handleChange}  />
-          <input type="text" placeholder="사업자 번호" className="login-input-box"  name="ownernum" id="ownernum" ref={refs.nUserid} value={formData.nUserid} onChange={handleChange} />
+          <input type="text" placeholder="아이디" className="login-input-box" name="userid" id="userid" ref={refs.userid} value={formData.userid} onChange={handleChange} />
+          <input type="password" placeholder="비밀번호" className="login-input-box" name="password" id="password" ref={refs.password} value={formData.password} onChange={handleChange}  />
+          <input type="number" placeholder="사업자 번호" className="login-input-box"  name="ownernum" id="ownernum" ref={refs.ownernum} value={formData.ownernum} onChange={handleChange} />
         </div>
         <button className="login-login-button" onClick={handleLogin}>로그인</button>
       </div>

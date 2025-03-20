@@ -30,7 +30,8 @@
   margin-top: 10px;
   border: none;
   border-top: 2px solid #003f66;
-  width: 100%;
+  width: 115%;
+  margin-left: -50px;
   margin-bottom: 30px;
 }
 
@@ -56,7 +57,7 @@
 .input-group input {
   flex: 1;
   padding: 12px;
-  border: 1px solid #003f66;
+  border: 2px solid #D3D3D3;
   border-radius: 5px;
   font-size: 16px;
 }
@@ -171,4 +172,5 @@
   cursor: pointer;
   text-decoration: underline;
   font-weight: bold;
+  white-space: nowrap; /* 줄바꿈 방지 */
 }
