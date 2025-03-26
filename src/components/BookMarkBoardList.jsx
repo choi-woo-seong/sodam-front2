@@ -6,35 +6,39 @@ const BookMarkBoardList = () => {
 const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
+  const name = localStorage.getItem("userName");
+  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("jwt");
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("jwt");
 
-        if (!token) {
-          setMessage("로그인이 필요합니다.");
-          return;
-        }
-
-        const response = await fetch("http://192.168.0.102:8080/api/products/searchAll", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("상품 조회에 실패했습니다.");
-        }
-
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        setErrors(error.message);
-        console.error("상품 조회 오류:", error.message);
+      if (!token) {
+        setMessage("로그인이 필요합니다.");
+        return;
       }
-    };
+
+      const response = await fetch("http://192.168.0.102:8080/api/bookmark/mapped", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("찜 조회에 실패했습니다.");
+      }
+
+      const result = await response.json();
+      console.log(result);
+      setData(result);
+    } catch (error) {
+      setErrors(error.message);
+      console.error("찜 조회 오류:", error.message);
+    }
+  };
 
     fetchData();
   }, []);
@@ -62,44 +66,24 @@ const [data, setData] = useState([]);
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
 
-  // const handleBookmark = async (e) => {
-  //   e.preventDefault();
-  
-  //   try {
-  //       const response = await fetch("http://192.168.0.102:8080/auth/bookmark", {
-  //           method: "GET",
-  //           headers: {
-  //               "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({
-  //             nUserid: formData.nUserid, // 🔥 필드명 확인 (백엔드와 동일해야 함)
-  //             nPassword: formData.nPassword,
-  //         }),
+  // 페이지 번호 범위 설정 (최대 5개 페이지 번호만 표시)
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const pageLimit = 5; // 보여줄 페이지 번호의 최대 개수
 
-  //           credentials: "include",
-  //           mode: 'cors', 
-  //       });
-  
-  //       if (!response.ok) {
-  //           const errorData = await response.json();
-  //           throw new Error(errorData.error || "로그인 실패");
-  //       }
-  
-  //       const data = await response.json();
-  //       localStorage.setItem("jwt", data.token); // 🔥 JWT 저장
-  //       localStorage.setItem("userName", data.name); // 🔥 사용자 이름 저장
-  
-  //       alert("로그인 성공! JWT:"+data.token + "이름:" + data.name);
-  //       setToken(data.token);
-  //       setUserName(data.name);
-  //       setErrorMessage("");
-  //       navigate("/main")
-  
-  //   } catch (error) {
-  //       console.error("로그인 오류:", error.message);
-  //       setErrorMessage(error.message);
-  //   }
-  // };
+    let startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+    let endPage = startPage + pageLimit - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
 
   return (
     <div className="board-list-container">
@@ -108,7 +92,6 @@ const [data, setData] = useState([]);
       <table className="board-table">
         <thead>
           <tr>
-            <th>번호</th>
             <th>제목</th>
             <th>작성자</th>
             <th>등록날짜</th>
@@ -117,14 +100,13 @@ const [data, setData] = useState([]);
         <tbody>
           {currentPosts && currentPosts.length > 0 ? (
                       currentPosts.map((post, index) => (
-                        <tr key={post.no}>
-                          <td>{post.no}</td>
+                        <tr key={post.id}>
                           <td>
-                            <Link to={`/bookMarkBoardList/${post.no}`} className="post-link">
+                            <Link to={`/${post.targetPgm}/${post.targetId}`} className="post-link">
                               {post.title}
                             </Link>
                           </td>
-                          <td>{post.username}</td>
+                          <td>{name}</td>
                           <td>{new Date(post.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))
@@ -144,21 +126,23 @@ const [data, setData] = useState([]);
           &lt;&lt;
         </span>
         <span
-          onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+          onClick={() =>
+            setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)
+          }
           style={{ cursor: "pointer", margin: "0 5px" }}
         >
           &lt;
         </span>
 
         {/* 페이지 번호 버튼들 */}
-        {[...Array(totalPages).keys()].map((num) => (
+        {getPageNumbers().map((num) => (
           <span
-            key={num + 1}
-            className={`page-number ${currentPage === num + 1 ? "active" : ""}`}
-            onClick={() => paginate(num + 1)}
+            key={num}
+            className={`page-number ${currentPage === num ? "active" : ""}`}
+            onClick={() => paginate(num)}
             style={{ cursor: "pointer", margin: "0 5px" }}
           >
-            {num + 1}
+            {num}
           </span>
         ))}
 

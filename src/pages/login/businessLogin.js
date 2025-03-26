@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React , {useState,useRef} from "react";
+import React, { useState, useRef } from "react";
 import { useEffect } from 'react';
 import "./login.css";
 
@@ -48,6 +48,7 @@ const BusinessLogin = () => {
         const data = await response.json();
         localStorage.setItem("jwt", data.token); // 🔥 JWT 저장
         localStorage.setItem("userName", data.name); // 🔥 사용자 이름 저장
+        localStorage.setItem("userType", "buser"); // 🔥 userType 저장
 
         setToken(data.token);
         setUserName(data.name);
@@ -58,6 +59,12 @@ const BusinessLogin = () => {
         console.error("로그인 오류:", error.message);
         alert("로그인 실패!! 관리자에게 문의바랍니다.");
         setErrorMessage(error.message);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin(e);
     }
   };
 
@@ -87,7 +94,7 @@ const BusinessLogin = () => {
         </Link>
       </div>
 
-      <div className="login-form-container">
+      <div className="login-form-container" onKeyDown={handleKeyDown}>
         <div className="login-input-container3">
           <input type="text" placeholder="아이디" className="login-input-box" name="userid" id="userid" ref={refs.userid} value={formData.userid} onChange={handleChange} />
           <input type="password" placeholder="비밀번호" className="login-input-box" name="password" id="password" ref={refs.password} value={formData.password} onChange={handleChange}  />

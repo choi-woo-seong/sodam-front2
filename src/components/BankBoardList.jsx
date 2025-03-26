@@ -7,40 +7,32 @@ const BankBoardList = () => {
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
 
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("jwt");
-  
-          if (!token) {
-            setMessage("로그인이 필요합니다.");
-            return;
-          }
-  
-          const response = await fetch("http://192.168.0.102:8080/api/products/searchAll", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-  
-          if (!response.ok) {
-            throw new Error("상품 조회에 실패했습니다.");
-          }
-  
-          const result = await response.json();
-          setData(result);
-        } catch (error) {
-          setErrors(error.message);
-          console.error("상품 조회 오류:", error.message);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://192.168.0.102:8080/api/gov/searchAll", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("대출 조회에 실패했습니다.");
         }
-      };
-  
-      fetchData();
-    }, []);
+        const result = await response.json();
+        console.log(result);
+        setData(result);
+      } catch (error) {
+        setErrors(error.message);
+        console.error("대출 조회 오류:", error.message);
+      }
+    };
 
+    fetchData();
+  }, []);
 
-// 현재 페이지를 관리하는 state
+  // 현재 페이지를 관리하는 state
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 5; // 한 페이지에 표시할 게시글 수
 
@@ -59,6 +51,25 @@ const BankBoardList = () => {
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
 
+  // 페이지 번호 범위 설정 (최대 5개 페이지 번호만 표시)
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const pageLimit = 5; // 보여줄 페이지 번호의 최대 개수
+
+    let startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+    let endPage = startPage + pageLimit - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="board-list-container">
       <h2 className="board-title">금융</h2>
@@ -73,24 +84,24 @@ const BankBoardList = () => {
           </tr>
         </thead>
         <tbody>
-           {currentPosts && currentPosts.length > 0 ? (
-                      currentPosts.map((post, index) => (
-                        <tr key={post.no}>
-                          <td>{post.no}</td>
-                          <td>
-                            <Link to={`/bankDetail/${post.no}`} className="post-link">
-                              {post.g_title}
-                            </Link>
-                          </td>
-                          <td>{post.username}</td>
-                          <td>{new Date(post.createdAt).toLocaleDateString()}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="4">등록된 글이 없습니다.</td>
-                      </tr>
-                    )}
+          {currentPosts && currentPosts.length > 0 ? (
+            currentPosts.map((post, index) => (
+              <tr key={post.no}>
+                <td>{post.no}</td>
+                <td>
+                  <Link to={`/bankDetail/${post.no}`} className="post-link">
+                    {post.finPrdNm}
+                  </Link>
+                </td>
+                <td>관리자</td>
+                <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">등록된 글이 없습니다.</td>
+            </tr>
+          )}
         </tbody>
       </table>
 
@@ -102,21 +113,23 @@ const BankBoardList = () => {
           &lt;&lt;
         </span>
         <span
-          onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+          onClick={() =>
+            setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)
+          }
           style={{ cursor: "pointer", margin: "0 5px" }}
         >
           &lt;
         </span>
 
         {/* 페이지 번호 버튼들 */}
-        {[...Array(totalPages).keys()].map((num) => (
+        {getPageNumbers().map((num) => (
           <span
-            key={num + 1}
-            className={`page-number ${currentPage === num + 1 ? "active" : ""}`}
-            onClick={() => paginate(num + 1)}
+            key={num}
+            className={`page-number ${currentPage === num ? "active" : ""}`}
+            onClick={() => paginate(num)}
             style={{ cursor: "pointer", margin: "0 5px" }}
           >
-            {num + 1}
+            {num}
           </span>
         ))}
 
@@ -135,8 +148,6 @@ const BankBoardList = () => {
           &gt;&gt;
         </span>
       </div>
-   
-
     </div>
   );
 };

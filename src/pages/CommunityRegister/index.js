@@ -8,7 +8,7 @@ const CommunityRegister = () => {
   // 자유게시판 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     c_title: "",
-    c_contents: "",
+    c_content: "",
   });
 
   // 오류 메시지 상태
@@ -18,7 +18,7 @@ const CommunityRegister = () => {
   // 각 입력 필드에 대한 ref 생성
   const refs = {
     c_title: useRef(null),
-    c_contents: useRef(null),
+    c_content: useRef(null),
   };
 
 
@@ -53,10 +53,10 @@ const CommunityRegister = () => {
     }
 
     try {
-      // FormData 객체로 폼 데이터와 파일을 전송
-      const formDataToSend = new FormData();
-      formDataToSend.append("c_title", formData.c_title);
-      formDataToSend.append("c_contents", formData.c_contents);
+      const formDataToSend = {
+        c_title: formData.c_title,
+        c_content: formData.c_content,
+      };
   
       const response = await fetch("http://192.168.0.102:8080/api/community/create", {
         method: "POST",
@@ -74,7 +74,7 @@ const CommunityRegister = () => {
       setMessage("성공적으로 등록되었습니다.");
       setFormData({
         c_title: "",
-        c_contents: "",
+        c_content: "",
       });
       navigate("/communityBoardList");
     } catch (error) {
@@ -125,10 +125,10 @@ const CommunityRegister = () => {
             <div className="register-label">내용</div>
             <textarea
               className="register-text large"
-              name="c_contents"
-              id="c_contents"
-              ref={refs.c_contents}
-              value={formData.c_contents}
+              name="c_content"
+              id="c_content"
+              ref={refs.c_content}
+              value={formData.c_content}
               onChange={handleChange}
             />
           </div>

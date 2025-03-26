@@ -13,71 +13,141 @@ function ProductDetail() {
   // 📌 찜 상태 (DB 연결 전에는 localStorage 사용)
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+
+  // 오류 메시지 상태
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
+
   // 📌 API에서 가져오는 상품 정보
   const [productDetails, setProductDetails] = useState({
     p_title: "상품 제목",
     p_price: "상품 금액",
     p_contents: "상품 설명",
     p_link: "http://상품링크.com",
-    p_name: "작성자", // 작성자 추가
-    p_createdDate: "작성일", // 작성일 추가
+    username: "작성자", // 작성자 추가
+    createdAt: "작성일", // 작성일 추가
     p_image: null, // 상품 이미지 추가
   });
 
   // 📌 ID 중복 확인 상태
   const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const fetchProductDetails = async () => {
+    try {
+      const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`); // 예시 API URL
+      if (!response.ok) {
+        throw new Error("상품 데이터 조회에 실패했습니다.");
+      }
+
+      const data = await response.json();
+
+      if (data) {
+        setProductDetails({
+          p_title: data.p_title || "상품 제목",
+          p_price: data.p_price || "상품 금액",
+          p_contents: data.p_contents || "상품 설명",
+          p_link: data.p_link || "http://상품링크.com",
+          username: data.username || "작성자", // 작성자 데이터 추가
+          createdAt: data.createdAt || "작성일", // 작성일 데이터 추가
+          p_image: data.p_image || null, // 상품 이미지 추가
+        });
+      } else {
+        console.error("빈 데이터 응답:", data);
+      }
+    } catch (error) {
+      console.error("상품 데이터 가져오기 실패:", error);
+    }
+  };
+
+  const fetchFavoriteDetails = async (e) => {
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+    
+    try {
+      // 📌 찜 추가 (배열에 추가)
+      const formDataToSend = {
+        targetId: id,
+        targetType: "PRODUCT",
+        targetPgm:"productDetail",
+      };
+
+      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json", // ✅ JSON 데이터 전송
+        },
+        body: JSON.stringify(formDataToSend)
+      }); // 예시 API URL
+      if (!response.ok) {
+        throw new Error("찜 데이터 체크에 실패했습니다.");
+      }
+
+      const data = await response.json();
+
+      if (data.favorited) {
+        setIsBookmarked(data.favorited);
+      } else {
+        setIsBookmarked(data.favorited);
+      }
+    } catch (error) {
+      console.error("찜 데이터 가져오기 실패:", error);
+    }
+  };
 
   // 📌 1️⃣ 마운트 시 localStorage에서 찜 여부 확인
   useEffect(() => {
     const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
     setIsBookmarked(savedBookmarks.includes(p_contents));
 
-    // 상품 데이터 API 호출 (예시로 제품 정보 호출)
-    const fetchProductDetails = async () => {
-      try {
-        const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`); // 예시 API URL
-        if (!response.ok) {
-          throw new Error("상품 데이터 조회에 실패했습니다.");
-        }
-
-        const data = await response.json();
-
-        if (data) {
-          setProductDetails({
-            p_title: data.p_title || "상품 제목",
-            p_price: data.p_price || "상품 금액",
-            p_contents: data.p_contents || "상품 설명",
-            p_link: data.p_link || "http://상품링크.com",
-            p_author: data.p_author || "작성자", // 작성자 데이터 추가
-            p_createdDate: data.p_createdDate || "작성일", // 작성일 데이터 추가
-            p_image: data.p_image || null, // 상품 이미지 추가
-          });
-        } else {
-          console.error("빈 데이터 응답:", data);
-        }
-      } catch (error) {
-        console.error("상품 데이터 가져오기 실패:", error);
-      }
-    };
-
+    // 상품 데이터 API 호출 
     fetchProductDetails();
+    // 찜 데이터 API 호출 
+    fetchFavoriteDetails();
   }, [id]); // 빈 배열을 두어 페이지 로드시 한 번만 실행
 
   // 📌 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
-  const handleBookmarkClick = () => {
-    const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+  const handleBookmarkClick = async (e) => {
+    e.preventDefault();
 
-    if (isBookmarked) {
-      // 📌 찜 해제 (배열에서 삭제)
-      const updatedBookmarks = savedBookmarks.filter((item) => item !== p_contents);
-      localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
-      setIsBookmarked(false);
-    } else {
-      // 📌 찜 추가 (배열에 추가)
-      savedBookmarks.push(p_contents);
-      localStorage.setItem("bookmarks", JSON.stringify(savedBookmarks));
-      setIsBookmarked(true);
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
     }
+      // 📌 찜 추가 (배열에 추가)
+      try {
+        const formDataToSend = {
+          targetId: id,
+          targetType: "PRODUCT",
+        };
+
+        console.log(formDataToSend)
+    
+        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json", // ✅ JSON 데이터 전송
+          },
+          body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
+        });
+    
+        if (!response.ok) {
+          throw new Error("등록에 실패했습니다.");
+        }
+    
+        setMessage("성공적으로 등록되었습니다.");
+     
+      } catch (error) {
+        setErrors(error.message);
+        console.error("찜 등록 오류:", error);
+      }
+      fetchFavoriteDetails();
   };
 
   // 🔹 목록 버튼 클릭 시 이동하는 함수
@@ -95,9 +165,11 @@ function ProductDetail() {
         <div className="detail-author-date">
           <span className="author">
             <FontAwesomeIcon icon={faUser} /> &nbsp;{/* 사람 아이콘 추가 */}
-            {productDetails.p_name}&nbsp;
+            {productDetails.username}&nbsp;
           </span>
-          <span className="created-date">작성일: {productDetails.p_createdDate}</span>
+          <span className="created-date">
+            작성일: {new Date(productDetails.createdAt).toLocaleDateString()}
+            </span>
         </div>
 
         <div className="detail-header">
@@ -166,6 +238,11 @@ function ProductDetail() {
             />
           </div>
         </div>
+
+        <div className="map-link">
+                <p className="map" onClick={() => navigate("/mapDetail")}>
+                <i class="fa-solid fa-location-dot"></i>&nbsp;길 찾기</p>
+            </div>
 
         <button className="detail-button" onClick={handleGoToList}>
           목록

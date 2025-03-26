@@ -3,7 +3,7 @@ import "../styles/MyPage.css"; // 스타일 적용
 import { useNavigate } from "react-router-dom"; 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-function MyPage() {
+function BusinessMyPage() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         id: "",
@@ -42,7 +42,7 @@ function MyPage() {
         <div className="mypage-container">
             <h2>마이페이지</h2>
             <div className="signup-link">
-                <p className="list" onClick={() => navigate("/writeList")}>
+                <p className="list" onClick={() => navigate("/businessWriteList")}>
                 <i class="fa-solid fa-file-pen"></i>&nbsp;작성한 글 목록</p>
             </div>
             <hr />
@@ -141,4 +141,4 @@ function MyPage() {
     );
 }
 
-export default MyPage;
+export default BusinessMyPage;

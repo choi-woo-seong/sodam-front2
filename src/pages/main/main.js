@@ -3,41 +3,20 @@ import "./main.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
 function Main({ apiEndpoints }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
- 
+  const [errors, setErrors] = useState("");
+  const [message, setMessage] = useState("");
+
   const [data, setData] = useState({
-    products: [
-      { id: 1, title: "가짜 상품 1" },
-      { id: 2, title: "가짜 상품 2" },
-      { id: 3, title: "가짜 상품 3" },
-    ],
-    businesses: [
-      { id: 1, title: "가짜 비즈니스 1" },
-      { id: 2, title: "가짜 비즈니스 2" },
-      { id: 3, title: "가짜 비즈니스 3" },
-    ],
-    financialServices: [
-      { id: 1, title: "가짜 금융 서비스 1" },
-      { id: 2, title: "가짜 금융 서비스 2" },
-      { id: 3, title: "가짜 금융 서비스 3" },
-    ],
-    freeBoard: [
-      { id: 1, title: "가짜 게시글 1" },
-      { id: 2, title: "가짜 게시글 2" },
-      { id: 3, title: "가짜 게시글 3" },
-    ],
-    notices: [
-      { id: 1, title: "가짜 공지사항 1" },
-      { id: 2, title: "가짜 공지사항 2" },
-      { id: 3, title: "가짜 공지사항 3" },
-    ],
-    qaList: [
-      { id: 1, title: "가짜 질문 1" },
-      { id: 2, title: "가짜 질문 2" },
-      { id: 3, title: "가짜 질문 3" },
-    ],
+    product: [],
+    biz: [],
+    question: [],
+    gov:[],
+    community: [],
+    notice: [],
   });
   const [recentlyViewed, setRecentlyViewed] = useState([]); // 최근 본 아이템 목록
   const navigate = useNavigate();
@@ -51,11 +30,45 @@ function Main({ apiEndpoints }) {
     }
     console.log("검색어 : ", searchTerm);
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+
+        if (!token) {
+          setMessage("로그인이 필요합니다.");
+          return;
+        }
+
+        const response = await fetch("http://192.168.0.102:8080/api/main/recent-posts", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`, // JWT 토큰 포함
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("데이터 조회에 실패했습니다.");
+        }
+
+        const result = await response.json();
+        console.log(result);
+        setData(result);
+      } catch (error) {
+        setErrors(error.message);
+        console.error("데이터 조회 오류:", error.message);
+      }
+    };
+    
+      fetchData();
+    }, []);
+
 
     // 🔹 네비게이션 함수 (최근 본 항목 저장 기능 수정)
-    const handleNavigate = (path, item) => {
-      const newItem = { id: item.id, title: item.title, path }; // 객체 형태로 저장
-  
+    const handleNavigateNo = (path, item) => {
+      const newItem = { id: item.no, title: item.title, path }; // 객체 형태로 저장
+
       // 중복 제거
       const updatedList = [newItem, ...recentlyViewed.filter((i) => i.id !== item.id)];
   
@@ -63,7 +76,21 @@ function Main({ apiEndpoints }) {
       setRecentlyViewed(updatedList);
       localStorage.setItem("recentlyViewed", JSON.stringify(updatedList));
   
-      navigate(`${path}/${item.id}`);
+      navigate(`${path}/${newItem.id}`);
+    };
+
+    // 🔹 네비게이션 함수 (최근 본 항목 저장 기능 수정)
+    const handleNavigateId = (path, item) => {
+      const newItem = { id: item.id, title: item.title, path }; // 객체 형태로 저장
+
+      // 중복 제거
+      const updatedList = [newItem, ...recentlyViewed.filter((i) => i.id !== item.id)];
+  
+      // 상태 업데이트 및 localStorage 저장
+      setRecentlyViewed(updatedList);
+      localStorage.setItem("recentlyViewed", JSON.stringify(updatedList));
+  
+      navigate(`${path}/${newItem.id}`);
     };
   
     // 🔹 페이지가 로드될 때 localStorage에서 최근 본 항목 불러오기
@@ -82,13 +109,14 @@ useEffect(() => {
     }
 
     const allItems = [
-      ...data.products,
-      ...data.businesses,
-      ...data.financialServices,
-      ...data.freeBoard,
-      ...data.notices,
-      ...data.qaList,
+      ...data.product,
+      ...data.biz,
+      ...data.gov,
+      ...data.community,
+      ...data.notice,
+      ...data.question,
     ];
+
 
     const filteredSuggestions = allItems.filter((item) =>
       item.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -144,7 +172,7 @@ useEffect(() => {
             {suggestions.map((item) => (
               <li
                 key={item.id}
-                onClick={() => handleNavigate(
+                onClick={() => handleNavigateId(
                   item.title.includes("상품")
                     ? "/productDetail"
                     : item.title.includes("비즈니스")
@@ -181,9 +209,9 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.products.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/productDetail', item)}>
-                    {item.title}
+                {data.product.map((item) => (
+                  <li key={item.no} onClick={() => handleNavigateNo('/productDetail', item)}>
+                    {item.p_title}
                   </li>
                 ))}
               </ul>
@@ -198,15 +226,14 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.businesses.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/businessDetail', item)}>
-                    {item.title}
+                {data.biz.map((item) => (
+                  <li key={item.no} onClick={() => handleNavigateNo('/businessDetail', item)}>
+                    {item.b_title}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* 금융 카드 */}
             <div className="card wide">
               <div className="card-header"  onClick={() => navigate('/bankBoardList')}>
                 금융
@@ -215,9 +242,9 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.financialServices.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/bankDetail', item)}>
-                    {item.title}
+                {data.gov.map((item) => (
+                  <li key={item.no} onClick={() => handleNavigateId('/bankDetail', item)}>
+                    {item.finPrdNm}
                   </li>
                 ))}
               </ul>
@@ -232,9 +259,9 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.freeBoard.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/communityDetail', item)}>
-                    {item.title}
+                {data.community.map((item) => (
+                  <li key={item.id} onClick={() => handleNavigateId('/communityDetail', item)}>
+                    {item.c_title}
                   </li>
                 ))}
               </ul>
@@ -249,9 +276,9 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.notices.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/noticeDetail', item)}>
-                    {item.title}
+                {data.notice.map((item) => (
+                  <li key={item.id} onClick={() => handleNavigateId('/noticeDetail', item)}>
+                    {item.n_title}
                   </li>
                 ))}
               </ul>
@@ -266,8 +293,8 @@ useEffect(() => {
                 </button>
               </div>
               <ul>
-                {data.qaList.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/QADetail', item)}>
+                {data.question.map((item) => (
+                  <li key={item.id} onClick={() => handleNavigateId('/QADetail', item)}>
                     {item.title}
                   </li>
                 ))}

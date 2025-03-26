@@ -7,8 +7,8 @@ const QARegister = () => {
   
   // Q&A 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
-    a_title: "",
-    a_contents: "",
+    title: "",
+    content: "",
   });
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
@@ -21,8 +21,8 @@ const QARegister = () => {
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
-    a_title: useRef(null),
-    a_contents: useRef(null),
+    title: useRef(null),
+    content: useRef(null),
   };
 
   // 폼의 입력값 변경 시 호출되는 함수
@@ -31,17 +31,6 @@ const QARegister = () => {
   };
 
 
-  // 중복확인 함수
-  const handleDuplicateCheck = () => {
-    fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.userid}`)
-        .then(response => response.json())
-        .then(data => {
-           
-        })
-        .catch(error => {
-            console.error("중복 확인 오류 발생:", error);
-        });
-};
 
 
   // 폼 유효성 검사 함수
@@ -60,7 +49,7 @@ const QARegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleProductInsert = async (e) => {
+  const handleQAInsert = async (e) => {
     e.preventDefault();
     console.log(formData);
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
@@ -72,16 +61,18 @@ const QARegister = () => {
 
     try {
       // FormData 객체로 폼 데이터와 파일을 전송
-      const formDataToSend = new FormData();
-      formDataToSend.append("a_title", formData.a_title);
-      formDataToSend.append("a_contents", formData.a_contents);
+      const formDataToSend = {
+        title: formData.title,
+        content: formData.content,
+      };
  
-      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+      const response = await fetch("http://192.168.0.102:8080/api/question/create", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`, // JWT 토큰 포함
+          "Content-Type": "application/json", // ✅ JSON 데이터 전송
         },
-        body: formDataToSend,
+        body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
       });
 
       if (!response.ok) {
@@ -90,8 +81,8 @@ const QARegister = () => {
 
       setMessage("성공적으로 등록되었습니다.");
       setFormData({
-        a_title: "",
-        a_contents: "",
+        title: "",
+        content: "",
       });
       navigate("/QABoardList");
     } catch (error) {
@@ -99,26 +90,12 @@ const QARegister = () => {
       console.error(" 등록 오류:", error);
     }
   };
-
+  
   // 폼 제출 시 호출되는 함수
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    // 폼 유효성 검사
     if (validateForm()) {
-      // 중복 확인 후 폼 제출
-      await handleDuplicateCheck();
-
-      if (isDuplicate) {
-        return; // 중복이 있을 경우 폼 제출을 막음
-      }
-
-      alert("Q&A 등록이 완료되었습니다!");
-      // 폼 초기화
-      setFormData({
-        a_title: "",
-        a_contents: "",
-      });
+      alert("등록되었습니다.");
     } else {
       alert("빈칸을 확인해주세요.");
     }
@@ -136,10 +113,10 @@ const QARegister = () => {
             <input
               type="text"
               className="register-text"
-              name="a_title"
-              id="a_title"
-              ref={refs.a_title}
-              value={formData.a_title}
+              name="title"
+              id="title"
+              ref={refs.title}
+              value={formData.title}
               onChange={handleChange}
             />
           </div>
@@ -149,10 +126,10 @@ const QARegister = () => {
             <div className="register-label">내용</div>
             <textarea
               className="register-text large"
-              name="a_contens"
-              id="a_contents"
-              ref={refs.a_contents}
-              value={formData.a_contents}
+              name="content"
+              id="content"
+              ref={refs.content}
+              value={formData.content}
               onChange={handleChange}
             />
           </div>
@@ -160,7 +137,7 @@ const QARegister = () => {
 
         {/* 제출 버튼 */}
         <button className="register-submit" type="submit"
-         onClick={handleDuplicateCheck} >
+         onClick={handleQAInsert} >
           등록
         </button>
       </div>

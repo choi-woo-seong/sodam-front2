@@ -9,13 +9,14 @@ const Signup = () => {
   // 일반폼 입력 상태
   const [formData, setFormData] = useState({
     nUserid: "",
-    nPassword: "",
+    nPassword: "",// ✅ 추가!
     nName: "",
     address: "",
     nEmail: "",
-    nPhone1: "", // 휴대전화 추가
-    nPhone2: "", // 휴대전화 추가
+    nPhone1: "",
+    nPhone2: "",
   });
+  
 
   // 에러 메시지 상태
   const [errors, setErrors] = useState({});
@@ -223,32 +224,48 @@ const Signup = () => {
   const handleNomalSingup = (e) => {
     e.preventDefault();
     console.log("회원가입 데이터:", formData);
-    if(cfCheckDuplicate === false){
+  
+    if (cfCheckDuplicate === false) {
       alert("아이디 중복확인 해주세요");
-    }else{  
-        fetch("http://192.168.0.102:8080/auth/register/nuser", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(formData), 
-            mode: 'cors', // CORS 요청을 명확히 설정
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-              alert("회원가입 성공!");
-              navigate("/personLogin")
-            } else {
-                console.error("회원가입 실패", data.message);
-            }
-        })
-        .catch(error => {
-            console.error("서버와 연결 중 오류 발생:", error);
-        });
+      return;
     }
+  
+    // ✅ snake_case로 변경된 payload
+    const payload = {
+      n_userid: formData.nUserid,
+      n_password: formData.nPassword,
+      n_name: formData.nName,
+      address: formData.address,
+      n_email: formData.nEmail,
+      n_phone1: formData.nPhone1,
+      n_phone2: formData.nPhone2,
+    };
+  
+    fetch("http://192.168.0.102:8080/auth/register/nuser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload), // 🔥 올바른 payload로 전송
+      mode: "cors",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("회원가입 실패");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("회원가입 성공!");
+        navigate("/personLogin");
+      })
+      .catch((error) => {
+        console.error("회원가입 에러:", error);
+        alert("회원가입 중 오류 발생. 관리자에게 문의하세요.");
+      });
   };
+  
 
   useEffect(() => {
     document.body.classList.add("signup-page-body");
@@ -295,7 +312,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>비밀번호 확인</label>
-            <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword}/>
+            <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword} onChange={handleChange}/>
           </div>
 
           <div className="input-container">

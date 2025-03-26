@@ -62,6 +62,26 @@ const ProductBoardList = () => {
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
 
+  // 페이지 번호 범위 설정 (최대 5개 페이지 번호만 표시)
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const pageLimit = 5; // 보여줄 페이지 번호의 최대 개수
+
+    let startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+    let endPage = startPage + pageLimit - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
+
+
   return (
     <div className="board-list-container">
       <h2 className="board-title">상품 목록</h2>
@@ -98,52 +118,51 @@ const ProductBoardList = () => {
       </table>
 
       <div className="pagination">
-        <span
-          onClick={goToFirstPage}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &lt;&lt;
-        </span>
-        <span
-          onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &lt;
-        </span>
-
-        {/* 페이지 번호 버튼들 */}
-        {[...Array(totalPages).keys()].map((num) => (
-          <span
-            key={num + 1}
-            className={`page-number ${currentPage === num + 1 ? "active" : ""}`}
-            onClick={() => paginate(num + 1)}
-            style={{ cursor: "pointer", margin: "0 5px" }}
-          >
-            {num + 1}
-          </span>
-        ))}
-
-        <span
-          onClick={() =>
-            setCurrentPage(currentPage < totalPages ? currentPage + 1 : totalPages)
-          }
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &gt;
-        </span>
-        <span
-          onClick={goToLastPage}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &gt;&gt;
-        </span>
-      </div>
-
-      {/* 글 작성 버튼을 Link로 수정하여 링크 이동 기능 추가 */}
-      <Link to="/productRegister">
-        <button className="list-btn">글 작성</button>
-      </Link>
-    </div>
+            <span
+                onClick={goToFirstPage}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &lt;&lt;
+              </span>
+              <span
+                onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &lt;
+              </span>
+      
+              {/* 페이지 번호 버튼들 */}
+              {getPageNumbers().map((num) => (
+                <span
+                  key={num }
+                  className={`page-number ${currentPage === num  ? "active" : ""}`}
+                  onClick={() => paginate(num )}
+                  style={{ cursor: "pointer", margin: "0 5px" }}
+                >
+                  {num}
+                </span>
+              ))}
+      
+              <span
+                onClick={() =>
+                  setCurrentPage(currentPage < totalPages ? currentPage + 1 : totalPages)
+                }
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &gt;
+              </span>
+              <span
+                onClick={goToLastPage}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &gt;&gt;
+              </span>
+            </div>
+               
+           <Link to="/productRegister">
+                   <button className="list-btn">글 작성</button>
+                 </Link>
+          </div>
   );
 };
 

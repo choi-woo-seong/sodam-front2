@@ -17,7 +17,7 @@ const [data, setData] = useState([]);
           return;
         }
 
-        const response = await fetch("http://192.168.0.102:8080/api/products/searchAll", {
+        const response = await fetch("http://192.168.0.102:8080/api/community/searchAll", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -62,6 +62,25 @@ const [data, setData] = useState([]);
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
 
+  // 페이지 번호 범위 설정 (최대 5개 페이지 번호만 표시)
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const pageLimit = 5; // 보여줄 페이지 번호의 최대 개수
+
+    let startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+    let endPage = startPage + pageLimit - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="board-list-container">
       <h2 className="board-title">자유게시판</h2>
@@ -78,14 +97,14 @@ const [data, setData] = useState([]);
         <tbody>
            {currentPosts && currentPosts.length > 0 ? (
                       currentPosts.map((post, index) => (
-                        <tr key={post.no}>
-                          <td>{post.no}</td>
+                        <tr key={post.id}>
+                          <td>{post.id}</td>
                           <td>
-                            <Link to={`/communityDetail/${post.no}`} className="post-link">
+                            <Link to={`/communityDetail/${post.id}`} className="post-link">
                               {post.c_title}
                             </Link>
                           </td>
-                          <td>{post.username}</td>
+                          <td>{post.authorName}</td>
                           <td>{new Date(post.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))
@@ -98,50 +117,51 @@ const [data, setData] = useState([]);
       </table>
 
       <div className="pagination">
-        <span
-          onClick={goToFirstPage}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &lt;&lt;
-        </span>
-        <span
-          onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &lt;
-        </span>
-
-        {/* 페이지 번호 버튼들 */}
-        {[...Array(totalPages).keys()].map((num) => (
-          <span
-            key={num + 1}
-            className={`page-number ${currentPage === num + 1 ? "active" : ""}`}
-            onClick={() => paginate(num + 1)}
-            style={{ cursor: "pointer", margin: "0 5px" }}
-          >
-            {num + 1}
-          </span>
-        ))}
-
-        <span
-          onClick={() =>
-            setCurrentPage(currentPage < totalPages ? currentPage + 1 : totalPages)
-          }
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &gt;
-        </span>
-        <span
-          onClick={goToLastPage}
-          style={{ cursor: "pointer", margin: "0 5px" }}
-        >
-          &gt;&gt;
-        </span>
-      </div>
-     <Link to="/communityRegister">
-             <button className="list-btn">글 작성</button>
-           </Link>
-    </div>
+            <span
+                onClick={goToFirstPage}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &lt;&lt;
+              </span>
+              <span
+                onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &lt;
+              </span>
+      
+              {/* 페이지 번호 버튼들 */}
+              {getPageNumbers().map((num) => (
+                <span
+                  key={num }
+                  className={`page-number ${currentPage === num  ? "active" : ""}`}
+                  onClick={() => paginate(num )}
+                  style={{ cursor: "pointer", margin: "0 5px" }}
+                >
+                  {num}
+                </span>
+              ))}
+      
+              <span
+                onClick={() =>
+                  setCurrentPage(currentPage < totalPages ? currentPage + 1 : totalPages)
+                }
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &gt;
+              </span>
+              <span
+                onClick={goToLastPage}
+                style={{ cursor: "pointer", margin: "0 5px" }}
+              >
+                &gt;&gt;
+              </span>
+            </div>
+               
+           <Link to="/communityRegister">
+                   <button className="list-btn">글 작성</button>
+                 </Link>
+          </div>
   );
 };
 
