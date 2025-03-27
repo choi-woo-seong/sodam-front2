@@ -158,7 +158,7 @@ const QABoardList = () => {
               </span>
             </div>
                
-           <Link to="qaRegister">
+           <Link to="/qaRegister">
                    <button className="list-btn">글 작성</button>
                  </Link>
           </div>

@@ -1,9 +1,8 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const QARegister = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   
   // Q&A 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
@@ -13,8 +12,7 @@ const QARegister = () => {
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
   const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState("");
-  
+  const [message, setMessage] = useState("");
 
   // 중복 확인 상태
   const [isDuplicate, setIsDuplicate] = useState(false);
@@ -29,9 +27,6 @@ const QARegister = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-
-
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
@@ -65,7 +60,7 @@ const QARegister = () => {
         title: formData.title,
         content: formData.content,
       };
- 
+
       const response = await fetch("http://192.168.0.102:8080/api/question/create", {
         method: "POST",
         headers: {
@@ -84,20 +79,17 @@ const QARegister = () => {
         title: "",
         content: "",
       });
-      navigate("/QABoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error(" 등록 오류:", error);
-    }
-  };
-  
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
+
+      // 성공 시 alert 표시
       alert("등록되었습니다.");
-    } else {
-      alert("빈칸을 확인해주세요.");
+      navigate("/QABoardList");
+
+    } catch (error) {
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
+      console.error(" 등록 오류:", error);
+
+      // 등록 실패 시 바로 alert 표시
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -119,6 +111,7 @@ const QARegister = () => {
               value={formData.title}
               onChange={handleChange}
             />
+            {errors.title && <span className="error">제목을 입력하세요.</span>}
           </div>
 
           {/* 내용 입력 */}
@@ -132,12 +125,12 @@ const QARegister = () => {
               value={formData.content}
               onChange={handleChange}
             />
+            {errors.content && <span className="error">내용을 입력하세요.</span>}
           </div>
         </div>
 
         {/* 제출 버튼 */}
-        <button className="register-submit" type="submit"
-         onClick={handleQAInsert} >
+        <button className="register-submit" type="button" onClick={handleQAInsert}>
           등록
         </button>
       </div>

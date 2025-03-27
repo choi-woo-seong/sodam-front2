@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
   const navigate = useNavigate();
+  
   // 상품 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     p_title: "",
@@ -41,12 +42,6 @@ const ProductRegister = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
-  // // 파일 첨부 처리
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files[0];
-  //   setFormData({ ...formData });
-  // };
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
@@ -121,21 +116,15 @@ const ProductRegister = () => {
         p_link: "",
       });
   
+      alert("등록되었습니다."); // 등록 성공 시 alert 표시
       navigate("/productBoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error("상품 등록 오류:", error);
-    }
-  };
-  
 
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      alert("등록되었습니다.");
-    } else {
-      alert("빈칸을 확인해주세요.");
+    } catch (error) {
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
+      console.error("상품 등록 오류:", error);
+
+      // 등록 실패 시 바로 alert 표시
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -157,6 +146,7 @@ const ProductRegister = () => {
               value={formData.p_title}
               onChange={handleChange}
             />
+            {errors.p_title && <span className="error">제목을 입력하세요.</span>}
           </div>
 
           {/* 금액 입력 */}
@@ -171,6 +161,7 @@ const ProductRegister = () => {
               value={formData.p_price}
               onChange={handleChange}
             />
+            {errors.p_price && <span className="error">금액을 입력하세요.</span>}
           </div>
 
           {/* 설명 입력 */}
@@ -184,6 +175,7 @@ const ProductRegister = () => {
               value={formData.p_contents}
               onChange={handleChange}
             />
+            {errors.p_contents && <span className="error">내용을 입력하세요.</span>}
           </div>
 
           {/* 링크 입력 */}
@@ -198,6 +190,7 @@ const ProductRegister = () => {
               value={formData.p_link}
               onChange={handleChange}
             />
+            {errors.p_link && <span className="error">링크를 입력하세요.</span>}
           </div>
 
           {/* 이미지 파일 첨부 */}
