@@ -1,56 +1,63 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-const QAUpdate = ({ qaId }) => {
-  // Q&A 등록/수정 폼 데이터 상태
+const QAUpdate = () => {
+  const { id } = useParams(); // URL에서 ID 가져오기
+  const navigate = useNavigate();
+  const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+  // Q&A 데이터 상태
   const [formData, setFormData] = useState({
-    a_title: "",
-    a_content: "",
+    title: "",
+    content: "",
   });
 
-  // 오류 메시지 상태
-  const [errors, setErrors] = useState({});
+  const [isUpdated, setIsUpdated] = useState(false); // 수정 성공 여부
+  const [errors, setErrors] = useState({}); // 오류 메시지 상태
 
-  // 중복 확인 상태
-  const [isDuplicate, setIsDuplicate] = useState(false);
-
-  // 각 입력 필드에 대한 ref 생성
+  // 입력 필드 참조
   const refs = {
-    a_title: useRef(null),
-    a_content: useRef(null),
+    title: useRef(null),
+    content: useRef(null),
   };
 
-  // 입력값 변경 시 호출되는 함수
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // ✅ 기존 데이터 불러오기
+  useEffect(() => {
+    const fetchQAData = async () => {
+      try {
+        const response = await fetch(`http://192.168.0.102:8080/api/question/questionDetail/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  // 중복 확인 함수
-  const handleDuplicateCheck = async () => {
-    try {
-      const response = await fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.a_title}`);
-      const data = await response.json();
+        if (!response.ok) throw new Error("Q&A 데이터를 가져오지 못했습니다.");
 
-      if (data.isDuplicate) {
-        setIsDuplicate(true);
-        alert("중복된 제목입니다. 다른 제목을 사용해주세요.");
-      } else {
-        setIsDuplicate(false);
+        const data = await response.json();
+        setFormData({
+          title: data.title || "",
+          content: data.content || "",
+        });
+      } catch (error) {
+        console.error("Q&A 데이터 가져오기 실패:", error);
       }
-    } catch (error) {
-      console.error("중복 확인 오류 발생:", error);
-    }
+    };
+
+    fetchQAData();
+  }, [id, token]);
+
+  // 입력값 변경 핸들러
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  // 폼 유효성 검사 함수
+  // 폼 유효성 검사
   const validateForm = () => {
     const newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      if (!formData[key]) newErrors[key] = "입력하세요.";  // 오류 메시지
-    });
+    if (!formData.title) newErrors.title = true;
+    if (!formData.content) newErrors.content = true;
 
     setErrors(newErrors);
 
-    // 첫 번째 빈 필드에 포커스를 맞추기
     if (Object.keys(newErrors).length > 0) {
       refs[Object.keys(newErrors)[0]].current.focus();
     }
@@ -58,66 +65,59 @@ const QAUpdate = ({ qaId }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Q&A 수정 함수
+  // ✅ Q&A 수정 요청
   const handleQAUpdate = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요.");
+      return;
+    }
 
-    if (validateForm()) {
-      // 중복 확인 후 수정
-      await handleDuplicateCheck();
-
-      if (isDuplicate) {
-        return; // 중복이 있을 경우 수정하지 않음
-      }
-
-      // PUT 요청으로 Q&A 수정
-      fetch(`http://192.168.0.102:8080/api/qa/${qaId}`, {
+    try {
+      const response = await fetch(`http://192.168.0.102:8080/api/question/update/${id}`, {
         method: "PUT",
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        mode: "cors", // CORS 설정
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data); // 수정된 Q&A 데이터 확인
-          alert("Q&A 수정이 완료되었습니다.");
-        })
-        .catch((error) => {
-          console.error("수정 중 오류 발생:", error);
-          alert("수정 중 오류가 발생했습니다.");
-        });
-    } else {
-      alert("빈칸을 확인해주세요.");
+        mode: "cors",
+      });
+
+      if (!response.ok) throw new Error("수정 실패");
+
+      setIsUpdated(true);
+      alert("Q&A 수정이 완료되었습니다.");
+      navigate(`/qaDetail/${id}`);
+    } catch (error) {
+      console.error("수정 중 오류 발생:", error);
+      alert("수정 중 오류가 발생했습니다.");
     }
   };
 
-  // Q&A 삭제 함수
-  const handleQADelete = () => {
-    if (window.confirm("정말로 이 Q&A를 삭제하시겠습니까?")) {
-      fetch(`http://192.168.0.102:8080/api/qa/${qaId}`, {
+  // ✅ Q&A 삭제 요청
+  const handleQADelete = async () => {
+    if (!window.confirm("정말로 이 Q&A를 삭제하시겠습니까?")) return;
+
+    try {
+      const response = await fetch(`http://192.168.0.102:8080/api/question/delete/${id}`, {
         method: "DELETE",
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",
-        mode: "cors", // CORS 설정
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data) {
-            alert("Q&A 삭제가 완료되었습니다.");
-            // 삭제 후 페이지 이동 (예시: Q&A 목록으로 돌아가기)
-            window.location.href = "/qa"; // 예시: Q&A 목록으로 돌아가기
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("삭제 중 문제 발생:", error);
-        });
+        mode: "cors",
+      });
+
+      if (!response.ok) throw new Error("삭제 실패");
+
+      alert("Q&A 삭제가 완료되었습니다.");
+      navigate("/QABoardList"); 
+    } catch (error) {
+      console.error("삭제 중 문제 발생:", error);
+      alert("삭제 실패");
     }
   };
 
@@ -133,10 +133,10 @@ const QAUpdate = ({ qaId }) => {
             <input
               type="text"
               className="register-text"
-              name="a_title"
-              id="a_title"
-              ref={refs.a_title}
-              value={formData.a_title}
+              name="title"
+              id="title"
+              ref={refs.title}
+              value={formData.title}
               onChange={handleChange}
             />
           </div>
@@ -146,10 +146,10 @@ const QAUpdate = ({ qaId }) => {
             <div className="register-label">내용</div>
             <textarea
               className="register-text large"
-              name="a_content"
-              id="a_content"
-              ref={refs.a_content}
-              value={formData.a_content}
+              name="content"
+              id="content"
+              ref={refs.content}
+              value={formData.content}
               onChange={handleChange}
             />
           </div>
