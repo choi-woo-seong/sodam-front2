@@ -1,10 +1,9 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const CommunityRegister = () => {
-    const navigate = useNavigate();
-  
+  const navigate = useNavigate();
+
   // 자유게시판 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     c_title: "",
@@ -20,7 +19,6 @@ const CommunityRegister = () => {
     c_title: useRef(null),
     c_content: useRef(null),
   };
-
 
   // 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
@@ -38,7 +36,7 @@ const CommunityRegister = () => {
     if (Object.keys(newErrors).length > 0) {
       refs[Object.keys(newErrors)[0]].current.focus();
     }
-    
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -57,7 +55,7 @@ const CommunityRegister = () => {
         c_title: formData.c_title,
         c_content: formData.c_content,
       };
-  
+
       const response = await fetch("http://192.168.0.102:8080/api/community/create", {
         method: "POST",
         headers: {
@@ -76,23 +74,29 @@ const CommunityRegister = () => {
         c_title: "",
         c_content: "",
       });
+
+      alert("등록되었습니다."); // 등록 성공 시 alert 표시
       navigate("/communityBoardList");
+
     } catch (error) {
-      setErrors(error.message);
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
       console.error("상품 등록 오류:", error);
+
+      // 등록 실패 시 바로 alert 표시
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       // 모든 필드가 채워졌다면 등록 처리
       alert("등록되었습니다.");
       setFormData({
         c_title: "",
-        c_contents: "",
+        c_content: "",
       });
     } else {
       // 빈칸이 있을 경우 얼럿 표시
