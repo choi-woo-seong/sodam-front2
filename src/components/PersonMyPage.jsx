@@ -1,19 +1,66 @@
-import React, { useState } from "react";
-import "../styles/MyPage.css"; // 스타일 적용
+import React, { useState, useEffect } from "react";
+import "../styles/MyPage.css"; 
 import { useNavigate } from "react-router-dom"; 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function PersonMyPage() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        id: "",
-        password: "",
-        confirmPassword: "",
-        name: "",
-        email: "",
-        phone1: "",
-        phone2: ""
-    });
+    const [formData, setFormData] = useState("");
+    const [message, setMessage] = useState("");
+
+    const fetchData = async () => {
+        try {
+            const token = localStorage.getItem("jwt");
+            if (!token) {
+                setMessage("로그인이 필요합니다.");
+                return;
+            }
+
+            const response = await fetch("http://192.168.0.102:8080/api/users/normal/info", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("상품 조회에 실패했습니다.");
+            }
+
+            const result = await response.json();
+            console.log(result);
+            setFormData(result);
+
+        } catch (error) {
+            console.error("상품 조회 오류:", error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+        
+        // 팝업 창에서 비밀번호 변경 데이터를 받을 이벤트 리스너 등록
+        window.addEventListener("message", receivePasswordData, false);
+
+        return () => {
+            window.removeEventListener("message", receivePasswordData, false);
+        };
+    }, []);
+
+    // 자식 창에서 비밀번호 데이터를 받아오는 함수
+    const receivePasswordData = (event) => {
+        if (event.origin !== window.location.origin) return; // 보안 체크
+
+        const { n_password } = event.data;
+        if (n_password) {
+            setFormData((prevData) => ({
+                ...prevData,
+                n_password: n_password
+            }));
+            alert("비밀번호가 변경되었습니다.");
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,13 +74,20 @@ function PersonMyPage() {
         }
     };
 
-    // 🚀 handleDelete 함수 추가 (탈퇴 버튼 동작)
     const handleDelete = () => {
         const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
         if (confirmDelete) {
             console.log("회원 탈퇴 진행");
-            // 여기서 실제 탈퇴 API 요청을 추가하면 됨
         }
+    };
+
+    // 비밀번호 변경 팝업 창 열기
+    const openPasswordPopup = () => {
+        window.open(
+            "/password-popup",
+            "비밀번호 변경",
+            "width=400,height=300,left=500,top=200"
+        );
     };
 
     return (
@@ -41,7 +95,8 @@ function PersonMyPage() {
             <h2>마이페이지</h2>
             <div className="signup-link">
                 <p className="list" onClick={() => navigate("/personWriteList")}>
-                <i class="fa-solid fa-file-pen"></i>&nbsp;작성한 글 목록</p>
+                    <i className="fa-solid fa-file-pen"></i>&nbsp;작성한 글 목록
+                </p>
             </div>
             <hr />
             <form onSubmit={handleSubmit}>
@@ -49,46 +104,30 @@ function PersonMyPage() {
                     <label>아이디</label>
                     <input 
                         type="text" 
-                        name="id" 
-                        value={formData.id} 
+                        name="n_userid" 
+                        value={formData.n_userid} 
                         onChange={handleChange} 
                         readOnly 
                     />
                 </div>
-                <div className="input-group">
-                    <label>비밀번호 수정</label>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        value={formData.password} 
-                        onChange={handleChange} 
-                    />
-                </div>
-                <div className="input-group">
-                    <label>비밀번호 확인</label>
-                    <input 
-                        type="password" 
-                        name="confirmPassword" 
-                        value={formData.confirmPassword} 
-                        onChange={handleChange} 
-                    />
-                </div>
+
                 <div className="input-group">
                     <label>이름</label>
                     <input 
                         type="text" 
-                        name="name" 
-                        value={formData.name} 
+                        name="n_name" 
+                        value={formData.n_name} 
                         onChange={handleChange} 
                         readOnly 
                     />
                 </div>
+
                 <div className="input-group">
                     <label>이메일 수정</label>
                     <input 
                         type="email" 
-                        name="email" 
-                        value={formData.email} 
+                        name="n_email" 
+                        value={formData.n_email} 
                         onChange={handleChange} 
                     />
                 </div>
@@ -96,8 +135,8 @@ function PersonMyPage() {
                     <label>연락처1 수정</label>
                     <input 
                         type="text" 
-                        name="phone1" 
-                        value={formData.phone1} 
+                        name="n_phone1" 
+                        value={formData.n_phone1} 
                         onChange={handleChange} 
                     />
                 </div>
@@ -105,10 +144,16 @@ function PersonMyPage() {
                     <label>연락처2 수정</label>
                     <input 
                         type="text" 
-                        name="phone2" 
-                        value={formData.phone2} 
+                        name="n_phone2" 
+                        value={formData.n_phone2} 
                         onChange={handleChange} 
                     />
+                </div>
+
+                <div className="input-group">
+                    <button type="button" className="password-btn" onClick={openPasswordPopup}>
+                        비밀번호 변경
+                    </button>
                 </div>
 
                 <div className="btn1">
@@ -118,6 +163,15 @@ function PersonMyPage() {
             </form>
         </div>
     );
+    
 }
+const openPasswordPopup = () => {
+    window.open(
+        "/password-popup",
+        "비밀번호 변경",
+        "width=400,height=300,left=500,top=200"
+    );
+};
+
 
 export default PersonMyPage;

@@ -91,7 +91,7 @@ const PersonWriteList = () => {
     return (
       <div className="write-list-container">
         <div className="my-link">
-          <p className="my" onClick={() => navigate("/businessMypage")}> 
+          <p className="my" onClick={() => navigate("/personMypage")}> 
             <i className="fas fa-user-circle clickable"></i>&nbsp;개인정보 수정
           </p>
         </div>
