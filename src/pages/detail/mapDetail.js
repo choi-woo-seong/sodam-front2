@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // `useLocation`을 추가해서 주소를 받음
 import "./map.css"; // 스타일 적용
 
 function MapDetail() {
   const { kakao } = window;
+  const { state } = useLocation(); // `state`를 통해 전달된 데이터 받기
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,11 +13,11 @@ function MapDetail() {
     // 카카오 맵 SDK 스크립트 로딩
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=668e283937fb605b2e2fc1571979350b&libraries=services,places`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=bcee7cb468e67bef00b2dca14bf2e56f&libraries=services,places`;
     document.head.appendChild(script);
 
     script.onload = () => {
-      console.log("카카오 맵 SDK 로드 성공!");  // 로딩 확인
+      console.log("카카오 맵 SDK 로드 성공!"); // 로딩 확인
       if (!window.kakao) {
         console.error("카카오 맵 SDK가 로드되지 않았습니다.");
         return;
@@ -29,17 +31,35 @@ function MapDetail() {
 
       const options = {
         center: new kakao.maps.LatLng(37.49875699165696, 127.02667739922292), // 지도 중심 위치
-        level: 3,  // 지도 확대 레벨
+        level: 3, // 지도 확대 레벨
       };
 
       const newMap = new kakao.maps.Map(container, options);
       setMap(newMap);
 
-      // 기본 마커 설정
-      const markerPosition = new kakao.maps.LatLng(37.49875699165696, 127.02667739922292);
-      const newMarker = new kakao.maps.Marker({ position: markerPosition });
-      newMarker.setMap(newMap);
-      setMarker(newMarker);
+      // 전달된 주소가 있다면 해당 주소를 기반으로 마커 설정
+      if (state && state.address) {
+        const geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(state.address, (result, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const lat = result[0].y;
+            const lng = result[0].x;
+
+            const moveLatLon = new kakao.maps.LatLng(lat, lng);
+            newMap.setCenter(moveLatLon); // 주소에 맞게 지도 이동
+
+            // 기존 마커 제거 후 새로운 마커 설정
+            if (marker) marker.setMap(null);
+            const newMarker = new kakao.maps.Marker({
+              position: moveLatLon,
+            });
+            newMarker.setMap(newMap);
+            setMarker(newMarker);
+          } else {
+            alert("주소를 찾을 수 없습니다!");
+          }
+        });
+      }
     };
 
     // 스크립트 로딩 실패 시 오류 처리
@@ -51,7 +71,7 @@ function MapDetail() {
     return () => {
       document.head.removeChild(script);
     };
-  }, []);
+  }, []); // state 또는 marker 변경 시 지도 다시 렌더링
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
@@ -87,7 +107,7 @@ function MapDetail() {
       <div className="map-detail-content">
         <h2 className="map-detail-title">지도</h2>
         <hr />
-        
+
         <div className="map-all">
           {/* 🔍 카카오 스타일 검색 UI */}
           <div className="map-search-box">

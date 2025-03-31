@@ -330,8 +330,20 @@ const Signup = () => {
 
           <div className="input-container">
             <label>전화번호</label>
-            <input type="number" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} />
-            <input type="number" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} />
+            <input type="number" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} 
+            className="no-spinner"
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+            }}/>
+          </div>
+
+          <div className="input-container">
+            <label>휴대전화</label>
+            <input type="number" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} 
+            className="no-spinner"
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+            }}/>
           </div>
 
           <div className="submit-button-container">
@@ -368,6 +380,13 @@ const Signup = () => {
             <div className="success-msg">비밀번호가 일치합니다.</div>
           )}
 
+          
+<div className="input-container">
+            <label>이름</label>
+            <input type="text" name="name" ref={refs1.name} value={formData1.name} onChange={handleChange1} />
+          </div>
+
+
           <div className="input-container">
             <label>사업자명</label>
             <input type="text" name="ownername" ref={refs1.ownername} value={formData1.ownername} onChange={handleChange1} />
@@ -375,7 +394,11 @@ const Signup = () => {
 
           <div className="input-container">
             <label>사업자번호</label>
-            <input type="text" name="ownernum" ref={refs1.ownernum} value={formData1.ownernum} onChange={handleChange1} />
+            <input type="number" name="ownernum" ref={refs1.ownernum} value={formData1.ownernum} onChange={handleChange1}
+            className="no-spinner" 
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+            }}/>
           </div>
 
           <div className="input-container">
@@ -390,12 +413,24 @@ const Signup = () => {
 
           <div className="input-container">
             <label>전화번호</label>
-            <input type="number" name="phone1" ref={refs1.phone1} value={formData1.phone1} onChange={handleChange1} />
-            <input type="number" name="phone2" ref={refs1.phone2} value={formData1.phone2} onChange={handleChange1} />
+            <input type="number" name="phone1" ref={refs1.phone1} value={formData1.phone1} onChange={handleChange1} 
+            className="no-spinner"
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+            }}/>
+          </div>
+
+          <div className="input-container">
+            <label>휴대전화</label>
+            <input type="number" name="phone2" ref={refs1.phone2} value={formData1.phone2} onChange={handleChange1} 
+            className="no-spinner"
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+            }}/>
           </div>
 
           <div className="submit-button-container">
-            <button type="submit" className="submit" onClick={handleNomalSingup}>회원가입</button>
+            <button type="submit" className="submit" onClick={handleSingup}>회원가입</button>
           </div>
         </form>
       )}
