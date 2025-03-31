@@ -8,7 +8,8 @@ const Signup = () => {
   // 일반회원 입력 상태
   const [formData, setFormData] = useState({
     n_userid: "",
-    password: "",// ✅ 추가!
+    password: "",
+    confirmPassword: "",
     name: "",
     address: "",
     email: "",
@@ -30,8 +31,8 @@ const Signup = () => {
     name: useRef(null),
     address: useRef(null),
     email: useRef(null),
-    phone1 : useRef(null),
-    phone2 : useRef(null),
+    phone1: useRef(null),
+    phone2: useRef(null),
   };
 
   // 사업자 회원 입력 상태
@@ -106,8 +107,8 @@ const Signup = () => {
   const handleDuplicateCheck = () => {
     setcfCheckDuplicate(true);
     if (!formData.n_userid.trim()) {
-        alert("아이디를 입력해주세요.");
-        return;
+      alert("아이디를 입력해주세요.");
+      return;
     }
 
     const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
@@ -199,7 +200,7 @@ const Signup = () => {
       address: formData.address,
       email: formData.email,
       phone1: formData.phone1,
-      phone2: formData.phone2
+      phone2: formData.phone2,
     };
 
     fetch("http://192.168.0.102:8080/auth/register/nuser", {
@@ -304,11 +305,11 @@ const Signup = () => {
             <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword} onChange={handleChange} />
           </div>
 
-          {formData.nPassword && formData.confirmPassword && formData.nPassword !== formData.confirmPassword && (
+          {formData.nPassword && formData.confirmPassword && formData.password !== formData.confirmPassword && (
             <div className="error-msg">비밀번호가 일치하지 않습니다.</div>
           )}
 
-          {formData.nPassword && formData.confirmPassword && formData.nPassword === formData.confirmPassword && (
+          {formData.nPassword && formData.confirmPassword && formData.password === formData.confirmPassword && (
             <div className="success-msg">비밀번호가 일치합니다.</div>
           )}
 
@@ -329,8 +330,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>전화번호</label>
-
-            <input type="number" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} 
+            <input type="number" name="phone1" ref={refs.phone1} value={formData.phone1} onChange={handleChange} 
             className="no-spinner"
             onInput={(e) => {
               e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
@@ -339,12 +339,11 @@ const Signup = () => {
 
           <div className="input-container">
             <label>휴대전화</label>
-            <input type="number" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} 
+            <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} 
             className="no-spinner"
             onInput={(e) => {
               e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
             }}/>
-            <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} />
           </div>
 
           <div className="submit-button-container">
@@ -381,12 +380,10 @@ const Signup = () => {
             <div className="success-msg">비밀번호가 일치합니다.</div>
           )}
 
-          
           <div className="input-container">
             <label>이름</label>
-            <input type="text" name="name" ref={refs1.name} value={formData1.name} onChange={handleChange1} />
+            <input type="text" name="name" ref={refs.name} value={formData1.name} onChange={handleChange1} />
           </div>
-
 
           <div className="input-container">
             <label>사업자명</label>

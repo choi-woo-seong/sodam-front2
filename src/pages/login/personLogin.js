@@ -30,7 +30,7 @@ const PersonLogin = () => {
     e.preventDefault();
 
     // 필드 값 검증
-    if (!formData.nUserid || !formData.nPassword) {
+    if (!formData.n_userid || !formData.password) {
       alert("모든 필드를 채워주세요."); // 필드가 비어있을 때 alert로 오류 메시지 표시
       return;
     }
