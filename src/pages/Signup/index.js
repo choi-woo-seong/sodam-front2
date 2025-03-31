@@ -7,16 +7,9 @@ const Signup = () => {
 
   // 일반회원 입력 상태
   const [formData, setFormData] = useState({
-<<<<<<< HEAD
-    nUserid: "",
-    nPassword: "",
-    confirmPassword: "",
-    nName: "",
-=======
     n_userid: "",
     password: "",// ✅ 추가!
     name: "",
->>>>>>> feature-babo
     address: "",
     email: "",
     phone1: "",
@@ -36,15 +29,9 @@ const Signup = () => {
     confirmPassword: useRef(null),
     name: useRef(null),
     address: useRef(null),
-<<<<<<< HEAD
-    nEmail: useRef(null),
-    nPhone1: useRef(null),
-    nPhone2: useRef(null),
-=======
     email: useRef(null),
     phone1 : useRef(null),
     phone2 : useRef(null),
->>>>>>> feature-babo
   };
 
   // 사업자 회원 입력 상태
@@ -118,15 +105,9 @@ const Signup = () => {
   // 중복확인 함수 (일반 회원)
   const handleDuplicateCheck = () => {
     setcfCheckDuplicate(true);
-<<<<<<< HEAD
-    if (!formData.nUserid.trim()) {
-      alert("아이디를 입력해주세요.");
-      return;
-=======
     if (!formData.n_userid.trim()) {
         alert("아이디를 입력해주세요.");
         return;
->>>>>>> feature-babo
     }
 
     const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
@@ -348,28 +329,22 @@ const Signup = () => {
 
           <div className="input-container">
             <label>전화번호</label>
-<<<<<<< HEAD
+
             <input type="number" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} 
             className="no-spinner"
             onInput={(e) => {
               e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
             }}/>
-=======
-            <input type="number" name="phone1" ref={refs.phone1} value={formData.phone1} onChange={handleChange} />
->>>>>>> feature-babo
           </div>
 
           <div className="input-container">
             <label>휴대전화</label>
-<<<<<<< HEAD
             <input type="number" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} 
             className="no-spinner"
             onInput={(e) => {
               e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
             }}/>
-=======
             <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} />
->>>>>>> feature-babo
           </div>
 
           <div className="submit-button-container">
@@ -407,7 +382,7 @@ const Signup = () => {
           )}
 
           
-<div className="input-container">
+          <div className="input-container">
             <label>이름</label>
             <input type="text" name="name" ref={refs1.name} value={formData1.name} onChange={handleChange1} />
           </div>
