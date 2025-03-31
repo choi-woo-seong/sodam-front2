@@ -12,8 +12,8 @@ const PersonLogin = () => {
 
   // 로그인 폼 상태
   const [formData, setFormData] = useState({
-    nUserid: "",
-    nPassword: "",
+    n_userid: "",
+    password: "",
   });
 
   // 입력값 핸들링
@@ -22,8 +22,8 @@ const PersonLogin = () => {
   };
 
   const refs = {
-    nUserid: useRef(null),
-    nPassword: useRef(null),
+    n_userid: useRef(null),
+    password: useRef(null),
   };
 
   const handleLogin = async (e) => {
@@ -37,8 +37,8 @@ const PersonLogin = () => {
         },
         // 🔥 백엔드 DTO 맞춰서 snake_case 사용
         body: JSON.stringify({
-          n_userid: formData.nUserid,
-          n_password: formData.nPassword,
+          n_userid: formData.n_userid,
+          password: formData.password,
         }),
         mode: "cors",
       });
@@ -108,20 +108,20 @@ const PersonLogin = () => {
             type="text"
             placeholder="아이디"
             className="login-input-box"
-            name="nUserid"
-            id="nUserid"
-            ref={refs.nUserid}
-            value={formData.nUserid}
+            name="n_userid"
+            id="n_userid"
+            ref={refs.n_userid}
+            value={formData.n_userid}
             onChange={handleChange}
           />
           <input
             type="password"
             placeholder="비밀번호"
             className="login-input-box"
-            name="nPassword"
-            id="nPassword"
-            ref={refs.nPassword}
-            value={formData.nPassword}
+            name="password"
+            id="password"
+            ref={refs.password}
+            value={formData.password}
             onChange={handleChange}
           />
         </div>

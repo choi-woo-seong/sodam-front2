@@ -8,13 +8,13 @@ const Signup = () => {
 
   // 일반폼 입력 상태
   const [formData, setFormData] = useState({
-    nUserid: "",
-    nPassword: "",// ✅ 추가!
-    nName: "",
+    n_userid: "",
+    password: "",// ✅ 추가!
+    name: "",
     address: "",
-    nEmail: "",
-    nPhone1: "",
-    nPhone2: "",
+    email: "",
+    phone1: "",
+    phone2: "",
   });
   
 
@@ -26,14 +26,14 @@ const Signup = () => {
 
   // 일반입력 필드 포커스 관리
   const refs = {
-    nUserid: useRef(null),
-    nPassword: useRef(null),
+    n_userid: useRef(null),
+    password: useRef(null),
     confirmPassword: useRef(null),
-    nName: useRef(null),
+    name: useRef(null),
     address: useRef(null),
-    nEmail: useRef(null),
-    nPhone1 : useRef(null),
-    nPhone2 : useRef(null),
+    email: useRef(null),
+    phone1 : useRef(null),
+    phone2 : useRef(null),
   };
 
     // 사업자 폼 입력 상태
@@ -84,7 +84,7 @@ const Signup = () => {
       if (!formData[key]) newErrors[key] = "입력하세요.";
     });
 
-    if (formData.nPassword !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
 
@@ -110,12 +110,12 @@ const Signup = () => {
       // 중복확인 함수
   const handleDuplicateCheck = () => {
     setcfCheckDuplicate(true);
-    if (!formData.nUserid.trim()) {
+    if (!formData.n_userid.trim()) {
         alert("아이디를 입력해주세요.");
         return;
     }
 
-    const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.nUserid)}`;
+    const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
 
     fetch(url, {
         method: "GET",
@@ -232,13 +232,13 @@ const Signup = () => {
   
     // ✅ snake_case로 변경된 payload
     const payload = {
-      n_userid: formData.nUserid,
-      n_password: formData.nPassword,
-      n_name: formData.nName,
+      n_userid: formData.n_userid,
+      password: formData.password,
+      name: formData.name,
       address: formData.address,
-      n_email: formData.nEmail,
-      n_phone1: formData.nPhone1,
-      n_phone2: formData.nPhone2,
+      email: formData.email,
+      phone1: formData.phone1,
+      phone2: formData.phone2
     };
   
     fetch("http://192.168.0.102:8080/auth/register/nuser", {
@@ -299,7 +299,7 @@ const Signup = () => {
         <form onSubmit={handleSubmit}>
           <div className="input-container">
             <label>아이디</label>
-            <input type="text" name="nUserid" ref={refs.nUserid} value={formData.nUserid} onChange={handleChange} />
+            <input type="text" name="n_userid" ref={refs.n_userid} value={formData.n_userid} onChange={handleChange} />
             <button type="button" onClick={handleDuplicateCheck}>중복확인</button>
           </div>
           {isIdAvailable === false && <div className="error-msg">아이디가 이미 존재합니다.</div>}
@@ -307,7 +307,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>비밀번호</label>
-            <input type="password" name="nPassword" ref={refs.nPassword} value={formData.nPassword} onChange={handleChange} />
+            <input type="password" name="password" ref={refs.password} value={formData.password} onChange={handleChange} />
           </div>
 
           <div className="input-container">
@@ -317,7 +317,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>이름</label>
-            <input type="text" name="nName" ref={refs.nName} value={formData.nName} onChange={handleChange} />
+            <input type="text" name="name" ref={refs.name} value={formData.name} onChange={handleChange} />
           </div>
 
           <div className="input-container">
@@ -327,17 +327,17 @@ const Signup = () => {
 
           <div className="input-container">
             <label>이메일</label>
-            <input type="email" name="nEmail" ref={refs.nEmail} value={formData.nEmail} onChange={handleChange} />
+            <input type="email" name="email" ref={refs.email} value={formData.email} onChange={handleChange} />
           </div>
 
           <div className="input-container">
             <label>전화번호</label>
-            <input type="number" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} />
+            <input type="number" name="phone1" ref={refs.phone1} value={formData.phone1} onChange={handleChange} />
           </div>
 
           <div className="input-container">
             <label>휴대전화</label>
-            <input type="number" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} />
+            <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} />
           </div>
 
           <button type="submit" className="submit"   onClick={handleNomalSingup} >가입</button>
