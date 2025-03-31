@@ -13,7 +13,6 @@ function ProductDetail() {
   // 📌 찜 상태 (DB 연결 전에는 localStorage 사용)
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-
   // 오류 메시지 상태
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
@@ -24,6 +23,7 @@ function ProductDetail() {
     p_price: "상품 금액",
     p_contents: "상품 설명",
     p_link: "http://상품링크.com",
+    ownerloc: "지도",
     username: "작성자", // 작성자 추가
     createdAt: "작성일", // 작성일 추가
     p_image: null, // 상품 이미지 추가
@@ -46,6 +46,7 @@ function ProductDetail() {
           p_price: data.p_price || "상품 금액",
           p_contents: data.p_contents || "상품 설명",
           p_link: data.p_link || "http://상품링크.com",
+          ownerloc: data.ownerloc || "지도",
           username: data.username || "작성자", // 작성자 데이터 추가
           createdAt: data.createdAt || "작성일", // 작성일 데이터 추가
           p_image: data.p_image || null, // 상품 이미지 추가
@@ -65,7 +66,7 @@ function ProductDetail() {
       setMessage("로그인이 필요합니다.");
       return;
     }
-    
+
     try {
       // 📌 찜 추가 (배열에 추가)
       const formDataToSend = {
@@ -155,6 +156,11 @@ function ProductDetail() {
     navigate("/productBoardList"); // 🔹 "/noticelist" 페이지로 이동
   };
 
+  // 🔹 길찾기 버튼 클릭 시 MapDetail 페이지로 이동
+  const handleGoToMap = () => {
+    navigate("/mapDetail", { state: { address: productDetails.ownerloc } }); // `ownerloc` 값 전달
+  };
+
   return (
     <div className="detail-container">
       <div className="detail-content">
@@ -237,12 +243,24 @@ function ProductDetail() {
               disabled={true}
             />
           </div>
+          <div className="detail-row">
+            <div className="detail-label">지도</div>
+            <input
+              type="text"
+              className="detail-text"
+              name="ownerloc"
+              id="ownerloc"
+              value={productDetails.ownerloc}
+              disabled={true}
+            />
+          </div>
         </div>
 
         <div className="map-link">
-                <p className="map" onClick={() => navigate("/mapDetail")}>
-                <i class="fa-solid fa-location-dot"></i>&nbsp;길 찾기</p>
-            </div>
+          <p className="mapbutton" onClick={handleGoToMap}>
+            <i className="fa-solid fa-location-dot"></i>&nbsp;길 찾기
+          </p>
+        </div>
 
         <button className="detail-button" onClick={handleGoToList}>
           목록

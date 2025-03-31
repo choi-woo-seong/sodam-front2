@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
@@ -6,6 +7,7 @@ const ProductBoardList = () => {
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +63,19 @@ const ProductBoardList = () => {
   // 첫 번째, 마지막 페이지로 이동
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
+
+    // 🔹 네비게이션 처리 함수 (상품등록, 비즈니스 등록 접근 제한)
+    const handleNavigation = (page) => {
+      const userType = localStorage.getItem('userType'); // 🔥 userType 가져오기
+      if (userType === 'nuser') {
+        // 일반회원은 상품 등록과 비즈니스 등록에 접근할 수 없습니다
+        if (page === '/productRegister') {
+          alert("일반회원은 이 페이지에 접근할 수 없습니다.");
+          return;
+        }
+      }
+      navigate(page); // 조건이 맞으면 이동
+    };
 
   // 페이지 번호 범위 설정 (최대 5개 페이지 번호만 표시)
   const getPageNumbers = () => {
@@ -159,9 +174,9 @@ const ProductBoardList = () => {
               </span>
             </div>
                
-           <Link to="/productRegister">
-                   <button className="list-btn">글 작성</button>
-                 </Link>
+    
+                   <button className="list-btn" onClick={() => handleNavigation('/productRegister')}>글 작성</button>
+       
           </div>
   );
 };

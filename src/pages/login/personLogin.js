@@ -29,13 +29,18 @@ const PersonLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // 필드 값 검증
+    if (!formData.nUserid || !formData.nPassword) {
+      alert("모든 필드를 채워주세요."); // 필드가 비어있을 때 alert로 오류 메시지 표시
+      return;
+    }
+
     try {
       const response = await fetch("http://192.168.0.102:8080/auth/login/nuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        // 🔥 백엔드 DTO 맞춰서 snake_case 사용
         body: JSON.stringify({
           n_userid: formData.n_userid,
           password: formData.password,
@@ -61,7 +66,7 @@ const PersonLogin = () => {
       navigate("/main");
     } catch (error) {
       console.error("로그인 오류:", error.message);
-      alert("로그인 실패! 관리자에게 문의하세요.");
+      alert("로그인 실패! 관리자에게 문의하세요."); // 로그인 실패 시 alert로 메시지 표시
       setErrorMessage(error.message);
     }
   };

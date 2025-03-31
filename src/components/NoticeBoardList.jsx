@@ -160,7 +160,7 @@ const NoticeBoardList = () => {
               </span>
             </div>
                
-           <Link to="/businessRegister">
+           <Link to="/noticeRegister">
                    <button className="list-btn">글 작성</button>
                  </Link>
           </div>

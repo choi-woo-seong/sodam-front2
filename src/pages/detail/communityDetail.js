@@ -12,8 +12,8 @@ function CommunityDetail() {
   const [c_content, setContent] = useState(""); // 게시글 내용
   const c_contents = "자유게시판"; // 실제 데이터와 연결 필요
   const { id } = useParams(); // URL에서 productId 파라미터 가져오기
-  const [errors, setErrors] = useState("");
-  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState(""); // 오류 메시지
+  const [message, setMessage] = useState(""); // 성공/실패 메시지
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const navigate = useNavigate();
@@ -107,12 +107,20 @@ function CommunityDetail() {
         }),
       });
 
-      if (!response.ok) throw new Error("등록 실패");
+      if (!response.ok) throw new Error("댓글 등록 실패");
 
-      setComment("");
-      fetchData();
+      setMessage("댓글이 등록되었습니다."); // 성공 메시지
+      setComment(""); // 댓글 입력 초기화
+      fetchData(); // 댓글 목록 갱신
+
+      alert("댓글이 등록되었습니다."); // 등록 성공 시 alert 표시
+      navigate(`/communityDetail/${id}`); // 댓글 등록 후 게시글로 돌아가기
+
     } catch (error) {
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
       console.error("댓글 등록 오류:", error);
+
+      alert("댓글 등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -186,6 +194,9 @@ function CommunityDetail() {
             <textarea className="detail-text large" value={communityDetails.c_content} disabled />
           </div>
         </div>
+
+        {/* 성공/실패 메시지 표시 */}
+        {message && <div className="message">{message}</div>}
 
         <h3 className="detail-comment-list-title">댓글 목록</h3>
         <div className="detail-comment-table">

@@ -96,6 +96,8 @@ const BusinessWriteList = () => {
 
   return (
     <div className="write-list-container">
+       <h3>내가 쓴 글 목록 </h3>
+       <hr></hr>
       <div className="my-link">
         <p className="my" onClick={() => navigate("/businessMypage")}> 
           <i className="fas fa-user-circle clickable"></i>&nbsp;개인정보 수정

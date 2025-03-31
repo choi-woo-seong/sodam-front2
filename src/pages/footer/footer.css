@@ -1,45 +1,79 @@
+/* 푸터 스타일 */
 .footer {
-  background-color: #003f66;
+  background-color: #003f5c;
   color: white;
   text-align: center;
-  padding: 30px;
+  padding: 20px;
+  font-size: 14px;
+  position: relative; /* 부모 요소의 흐름을 유지 */
+  width: 100%;
   margin-top: 100px;
-  width: 100%; /* 전체 너비를 차지하도록 설정 */
-  overflow-x: hidden; /* 가로 스크롤 방지 */
-  box-sizing: border-box; /* 패딩 포함한 크기 유지 */
 }
 
-.footer-top {
+/* 소셜 아이콘 */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  margin-top: 15px;
+}
+
+.social-icons a {
+  color: #fff;
+  font-size: 30px;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.social-icons a:hover {
+  color: #1da1f2;
+}
+
+/* 메뉴 스타일 */
+.footer-menu {
+  margin-bottom: 30px;
   font-size: 18px;
-  margin-top: 30px;
-  display: flex; 
-  justify-content: center; /* 중앙 정렬 */
-  flex-wrap: wrap; /* 요소들이 넘칠 경우 줄바꿈 */
-  gap: 20px; /* 아이콘 간격 조절 */
-}
-
-.footer-top i {
-  margin-right: 15px;
-}
-
-.highlight-num {
-  font-size: 22px;
   font-weight: bold;
 }
 
-.footer-top span {
-  margin-right: 50px; 
+.footer-menu a {
+  color: #ddd;
+  margin: 0 10px;
+  text-decoration: none;
+  transition: color 0.3s;
+  position: relative;
 }
 
+/* 마지막 메뉴를 제외하고 세로바 추가 */
+.footer-menu a:not(:last-child)::after {
+  color: #ddd;
+  margin-left: 10px;
+}
+
+
+.footer-menu a:hover {
+  color: #fff;
+}
+
+/* 회사 정보 */
 .footer-info {
-  font-size: 13px;
-  margin-top: 50px;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 15px;
 }
 
-/* 전체 페이지에서 가로 스크롤 제거 */
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+/* 하단 정보 */
+.footer-bottom {
+  font-size: 13px;
+}
+
+.footer-bottom a {
+  color: #ddd;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  color: #fff;
 }
