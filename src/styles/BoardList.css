@@ -1,10 +1,10 @@
 /* 전체 페이지 최소 높이 설정 */
-body, .board-list-container {
+.board-list-container {
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  margin-bottom: -200px;
+  margin-bottom: -250px;
+  position: relative;
 }
+
 
 /* 테이블 스타일 */
 .board-table {
@@ -77,10 +77,10 @@ body, .board-list-container {
   font-size: 40px;
   font-weight: bold;
   color:  #003f66;
-  margin-top: 50px;
+  margin-top: 100px;
   margin-bottom: 20px;
   width: 60vw;  /* 테이블과 동일한 너비 */
-  max-width: 2000px;
+
 }
 
 /* 수평선 스타일 (화면 끝까지 가지 않도록 수정) */
@@ -88,9 +88,39 @@ body, .board-list-container {
   margin-top: 20px;
   border: none;
   border-top: 2px solid  #003f66;
-  width: 60vw;  /* 테이블과 동일한 너비 */
+  width:65%;  /* 테이블과 동일한 너비 */
   max-width: 2000px;
   margin: 0 auto 50px auto; /* 가운데 정렬 */
 }
+
+.list-btn {
+  position: absolute;
+  bottom: 20px;  /* 테이블 아래쪽으로 20px 만큼 떨어지게 */
+  right: 380px;  /* 테이블 오른쪽으로 20px 만큼 떨어지게 */
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #003f5c;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  width: auto;  /* 버튼의 너비가 고정되지 않도록 */
+  margin-bottom: 300px;
+
+}
+
+/* 화면 크기가 768px 이하일 때 버튼 크기 및 위치 조정 */
+@media (max-width: 1500px) {
+  .list-btn {
+    font-size: 18px;
+    padding: 12px 25px;
+    right: 100px;  /* 오른쪽 마진을 줄여서 화면에 맞게 조정 */
+    bottom: 10px;  /* 버튼 위치를 약간 위로 올림 */
+  }
+}
+
+
+
 
 

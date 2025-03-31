@@ -1,6 +1,10 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const NoticeRegister = () => {
+    const navigate = useNavigate();
+  
   // 공지 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     n_title: "",
@@ -9,6 +13,8 @@ const NoticeRegister = () => {
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
   const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState("");
+  
 
   // 중복 확인 상태
   const [isDuplicate, setIsDuplicate] = useState(false);
@@ -18,23 +24,12 @@ const NoticeRegister = () => {
     n_title: useRef(null),
     n_content: useRef(null),
   };
+  
 
   // 폼의 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
- // 중복확인 함수
- const handleDuplicateCheck = () => {
-  fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.userid}`)
-      .then(response => response.json())
-      .then(data => {
-         
-      })
-      .catch(error => {
-          console.error("중복 확인 오류 발생:", error);
-      });
-};
 
 
   // 폼 유효성 검사 함수
@@ -53,24 +48,52 @@ const NoticeRegister = () => {
 
     return Object.keys(newErrors).length === 0;
   };
-
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = async (e) => {
+  const handleNoticeInsert = async (e) => {
     e.preventDefault();
+    console.log(formData);
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
 
-    if (validateForm()) {
-      // 중복 확인 후 폼 제출
-      await handleDuplicateCheck();
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
 
-      if (isDuplicate) {
-        return; // 중복이 있을 경우 폼 제출을 막음
+    try {
+      const formDataToSend = {
+        n_title: formData.n_title,
+        n_content: formData.n_content,
+      };
+    
+      const response = await fetch("http://192.168.0.102:8080/api/notice/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json", // JWT 토큰 포함
+        },
+        body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
+      });
+
+      if (!response.ok) {
+        throw new Error("등록에 실패했습니다.");
       }
 
-      alert("등록 되었습니다.");
+      setMessage("성공적으로 등록되었습니다.");
       setFormData({
         n_title: "",
         n_content: "",
       });
+      navigate("/noticeBoardList");
+    } catch (error) {
+      setErrors(error.message);
+      console.error("상품 등록 오류:", error);
+    }
+  };
+
+  // 폼 제출 시 호출되는 함수
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      alert("등록되었습니다.");
     } else {
       alert("빈칸을 확인해주세요.");
     }
@@ -79,7 +102,7 @@ const NoticeRegister = () => {
   return (
     <div className="register-container">
       <div className="register-content">
-        <h2>공지 등록</h2>
+        <h2>공지사항 등록</h2>
         <hr />
         <div className="register-box">
           {/* 제목 입력 */}
@@ -108,13 +131,13 @@ const NoticeRegister = () => {
               value={formData.n_content}
               onChange={handleChange}
             />
-            {errors.n_content && <span className="error">{errors.n_content}</span>}
+            {errors.n_contents && <span className="error">{errors.n_content}</span>}
           </div>
         </div>
 
         {/* 제출 버튼 */}
         <button className="register-submit" type="submit"
-         onClick={handleDuplicateCheck} >
+         onClick={handleNoticeInsert} >
           등록
         </button>
       </div>

@@ -30,7 +30,8 @@
   margin-top: 10px;
   border: none;
   border-top: 2px solid #003f66;
-  width: 100%;
+  width: 115%;
+  margin-left: -50px;
   margin-bottom: 30px;
 }
 
@@ -56,7 +57,7 @@
 .input-group input {
   flex: 1;
   padding: 12px;
-  border: 1px solid #003f66;
+  border: 2px solid #D3D3D3;
   border-radius: 5px;
   font-size: 16px;
 }
@@ -86,6 +87,7 @@
   cursor: pointer; /* 클릭 가능한 포인터 */
   border-radius: 10px; /* 둥근 모서리 */
   box-sizing: border-box; /* 여백 및 패딩 포함 */
+  white-space: nowrap; /* 줄바꿈 방지 */
 
 }
 
@@ -104,10 +106,24 @@
 .submit-btn2 {
   background-color: #003f66; /* 수정 버튼 색상 */
   color: white; /* 글씨 색상 */
+  margin-bottom: 60px;
+}
+.password-btn{
+background: none;
+
+  border: none;
+  text-decoration: underline;
+font-size: 16px;
+font-weight: bold;
+
+}
+
+.popup-title{
+  margin-top: 20px;
 }
 
 /* 반응형 디자인 */
-@media (max-width: 1024px) {
+@media (max-width: 1500px) {
   .mypage-container {
     width: 70vw;
   }
@@ -130,7 +146,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1500px) {
   .mypage-container {
     width: 80vw;
   }
@@ -145,7 +161,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1500px) {
   .mypage-container {
     width: 90vw;
   }
@@ -155,9 +171,7 @@
     justify-content: center; /* 작은 화면에서는 가운데 정렬 */
   }
 
-  .submit-btn1, .submit-btn2 {
-    width: 100%; /* 버튼 크기 조정 */
-  }
+ 
 }
 
 /* signup-link 클래스 스타일: 작성한 글 목록 링크 */
@@ -171,4 +185,5 @@
   cursor: pointer;
   text-decoration: underline;
   font-weight: bold;
+  white-space: nowrap; /* 줄바꿈 방지 */
 }

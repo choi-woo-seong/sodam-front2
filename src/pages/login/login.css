@@ -30,11 +30,13 @@
   margin-bottom: 30px;  /* 간격 더 증가 */
   display: flex;
   align-items: center;
-  margin-left: 130px;  /* 제목 왼쪽 여백 더 증가 */
+  margin-left: 115px;  /* 제목 왼쪽 여백 더 증가 */
 }
 
 .login-highlight {
-  color: #003f66;
+  background: linear-gradient(135deg, #003f66, #007bb5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: 60px;  /* 하이라이트 크기 더 증가 */
 }
 
@@ -95,6 +97,7 @@
 
 .login-login-button {
   width: 100%;
+  font-weight: bold;
   padding: 20px;  /* 버튼 패딩 더 증가 */
   background-color: #003f66;
   color: #fff;

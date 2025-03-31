@@ -1,11 +1,19 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const CommunityRegister = () => {
+    const navigate = useNavigate();
+  
   // 자유게시판 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     c_title: "",
     c_content: "",
   });
+
+  // 오류 메시지 상태
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
@@ -13,21 +21,10 @@ const CommunityRegister = () => {
     c_content: useRef(null),
   };
 
+
   // 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-    // 중복확인 함수
-    const handleDuplicateCheck = () => {
-      fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.userid}`)
-          .then(response => response.json())
-          .then(data => {
-             
-          })
-          .catch(error => {
-              console.error("중복 확인 오류 발생:", error);
-          });
   };
 
   // 폼 유효성 검사 함수
@@ -45,7 +42,46 @@ const CommunityRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleCommunityInsert = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const formDataToSend = {
+        c_title: formData.c_title,
+        c_content: formData.c_content,
+      };
   
+      const response = await fetch("http://192.168.0.102:8080/api/community/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json", // ✅ JSON 데이터 전송
+        },
+        body: JSON.stringify(formDataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error("등록에 실패했습니다.");
+      }
+
+      setMessage("성공적으로 등록되었습니다.");
+      setFormData({
+        c_title: "",
+        c_content: "",
+      });
+      navigate("/communityBoardList");
+    } catch (error) {
+      setErrors(error.message);
+      console.error("상품 등록 오류:", error);
+    }
+  };
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = (e) => {
@@ -56,7 +92,7 @@ const CommunityRegister = () => {
       alert("등록되었습니다.");
       setFormData({
         c_title: "",
-        c_content: "",
+        c_contents: "",
       });
     } else {
       // 빈칸이 있을 경우 얼럿 표시
@@ -101,8 +137,7 @@ const CommunityRegister = () => {
         {/* 제출 버튼 */}
         <button 
           className="register-submit" 
-          type="submit" 
-          onClick={handleDuplicateCheck}
+          onClick={handleCommunityInsert}
         >
           등록
         </button>

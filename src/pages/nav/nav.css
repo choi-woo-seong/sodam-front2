@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
 /* 전체적인 설정 */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+}
+
+.navbar {
+  margin-bottom: 30px
 }
 
 .nav-user {
@@ -33,16 +38,27 @@ body {
   display: flex;
   align-items: center;
   white-space: nowrap; /* 줄바꿈 방지 */
-  margin-top: 30px;
+  margin-top: 50px;
   margin-left: 30px;
   margin-bottom: -30PX;
   justify-content: center;
+  cursor: pointer;
+  
 }
 
 .nav-logo .highlight {
   font-size: 75px;
-  color: #003f66;
+  font-weight: bold;
+  background: linear-gradient(135deg, #003f66, #007bb5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-left: 5px;
+}
+
+/* 호버 시 전체 로고에 애니메이션 효과 적용 */
+.title-logo:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 /* 네비게이션 바 */
@@ -68,23 +84,13 @@ body {
     cursor: pointer;
   }
   
-/* 화면 크기가 줄어들 때 로고와 메뉴 사이의 간격 줄이기 */
-@media (max-width: 1024px) {
-  .nav-logo {
-    margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
-  }
-
-  .nav-menu {
-    margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
-  }
-}
-
+  
   /* 서브메뉴 스타일 */
   .submenu {
     opacity: 0;
     visibility: hidden;
     position: absolute;
-    top: 72px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%); /* 정확한 가운데 정렬 */
     background-color: white;
@@ -131,8 +137,18 @@ body {
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
   }
-
   
-
+  
+  
+  /* 화면 크기가 줄어들 때 로고와 메뉴 사이의 간격 줄이기 */
+  @media (max-width: 1024px) {
+    .nav-logo {
+      margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
+    }
+  
+    .nav-menu {
+      margin-left: 10%; /* 화면 크기에 따라 여백 조정 */
+    }
+  }
 
 

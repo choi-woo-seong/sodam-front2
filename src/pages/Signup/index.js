@@ -8,30 +8,32 @@ const Signup = () => {
 
   // 일반폼 입력 상태
   const [formData, setFormData] = useState({
-    nUserid: "",
-    nPassword: "",
-    nName: "",
+    n_userid: "",
+    password: "",// ✅ 추가!
+    name: "",
     address: "",
-    nEmail: "",
-    nPhone1: "", // 휴대전화 추가
-    nPhone2: "", // 휴대전화 추가
+    email: "",
+    phone1: "",
+    phone2: "",
   });
+  
 
   // 에러 메시지 상태
   const [errors, setErrors] = useState({});
   const [selectedTab, setSelectedTab] = useState("business");
   const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const [cfCheckDuplicate, setcfCheckDuplicate] = useState(false);
 
   // 일반입력 필드 포커스 관리
   const refs = {
-    nUserid: useRef(null),
-    nPassword: useRef(null),
+    n_userid: useRef(null),
+    password: useRef(null),
     confirmPassword: useRef(null),
-    nName: useRef(null),
+    name: useRef(null),
     address: useRef(null),
-    nEmail: useRef(null),
-    nPhone1 : useRef(null),
-    nPhone2 : useRef(null),
+    email: useRef(null),
+    phone1 : useRef(null),
+    phone2 : useRef(null),
   };
 
     // 사업자 폼 입력 상태
@@ -82,7 +84,7 @@ const Signup = () => {
       if (!formData[key]) newErrors[key] = "입력하세요.";
     });
 
-    if (formData.nPassword !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
 
@@ -105,72 +107,105 @@ const Signup = () => {
     }
   };
 
- 
-
-    // 중복확인 함수
-  const handleDuplicateCheck = () => {
-      if(formData.nUserid.length !== 0){
-        fetch(`http://192.168.0.102:8080/api/users/check-duplicate?n_userid=${formData.nUserid}`)
-            .then(response => response.json())
-            .then(data => {
-              if (data) {
-                  // 이미 존재하는 아이디
-                  setIsIdAvailable(false);
-                  alert("이미 사용 중인 아이디입니다.");
-              } else {
-                  // 사용 가능한 아이디
-                  setIsIdAvailable(true);
-                  alert("사용 가능한 아이디입니다.");
-              }
-
-            })
-            .catch(error => {
-                console.error("중복 확인 오류 발생:", error);
-            });
-      }else{
-        alert("아이디를 입력하지 않았습니다.");
-      }
-    };
-
       // 중복확인 함수
-  const handleDuplicateCheck2 = () => {
-    if(formData1.userid.length !== 0){
-      fetch(`http://192.168.0.102:8080/api/users/check-duplicate2?userid=${formData1.userid}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data) {
-            
-                // 이미 존재하는 아이디
+  const handleDuplicateCheck = () => {
+    setcfCheckDuplicate(true);
+    if (!formData.n_userid.trim()) {
+        alert("아이디를 입력해주세요.");
+        return;
+    }
+
+    const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
+
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        mode: "cors",
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("서버 응답 오류: " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("중복 확인 응답:", data);
+
+            if (data.isDuplicate) {
                 setIsIdAvailable(false);
                 alert("이미 사용 중인 아이디입니다.");
             } else {
-                // 사용 가능한 아이디
                 setIsIdAvailable(true);
                 alert("사용 가능한 아이디입니다.");
             }
+        })
+        .catch(error => {
+            console.error("중복 확인 오류 발생:", error);
+            alert("서버 요청 중 오류가 발생했습니다.");
+        });
+    };
+  
 
+      // 중복확인 함수
+  const handleDuplicateCheck2 = () => {
+      setcfCheckDuplicate(true);
+      if (!formData1.userid.trim()) {
+          alert("아이디를 입력해주세요.");
+          return;
+      }
+
+      const url = `http://192.168.0.102:8080/api/users/check-duplicate2?userid=${encodeURIComponent(formData1.userid)}`;
+
+      fetch(url, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          mode: "cors",
+      })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error("서버 응답 오류: " + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("중복 확인 응답:", data);
+
+              if (data.isDuplicate) {
+                  setIsIdAvailable(false);
+                  alert("이미 사용 중인 아이디입니다.");
+              } else {
+                  setIsIdAvailable(true);
+                  alert("사용 가능한 아이디입니다.");
+              }
           })
           .catch(error => {
               console.error("중복 확인 오류 발생:", error);
+              alert("서버 요청 중 오류가 발생했습니다.");
           });
-      }else{
-        alert("아이디를 입력하지 않았습니다");
-      }
   };
+
+    
   
   const handleSingup = (e) => {
     e.preventDefault();
     console.log("회원가입 데이터:", formData1);
-  
-    fetch("http://192.168.0.102:8080/auth/register/buser", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData1),
-        mode: 'cors', // CORS 요청을 명확히 설정
-    })
+
+    if(cfCheckDuplicate === false){
+          alert("아이디 중복확인 해주세요");
+    }else{  
+          fetch("http://192.168.0.102:8080/auth/register/buser", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify(formData1),
+              mode: 'cors', // CORS 요청을 명확히 설정
+          })
         .then(response => response.json())
         .then(data => {
             if (data) {
@@ -183,34 +218,54 @@ const Signup = () => {
         .catch(error => {
             console.error("서버와 연결 중 오류 발생:", error);
         });
+      }
   };
 
   const handleNomalSingup = (e) => {
     e.preventDefault();
     console.log("회원가입 데이터:", formData);
   
+    if (cfCheckDuplicate === false) {
+      alert("아이디 중복확인 해주세요");
+      return;
+    }
+  
+    // ✅ snake_case로 변경된 payload
+    const payload = {
+      n_userid: formData.n_userid,
+      password: formData.password,
+      name: formData.name,
+      address: formData.address,
+      email: formData.email,
+      phone1: formData.phone1,
+      phone2: formData.phone2
+    };
+  
     fetch("http://192.168.0.102:8080/auth/register/nuser", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData), 
-        mode: 'cors', // CORS 요청을 명확히 설정
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload), // 🔥 올바른 payload로 전송
+      mode: "cors",
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-              alert("회원가입 성공!");
-              navigate("/personLogin")
-            } else {
-                console.error("회원가입 실패", data.message);
-            }
-        })
-        .catch(error => {
-            console.error("서버와 연결 중 오류 발생:", error);
-        });
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("회원가입 실패");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("회원가입 성공!");
+        navigate("/personLogin");
+      })
+      .catch((error) => {
+        console.error("회원가입 에러:", error);
+        alert("회원가입 중 오류 발생. 관리자에게 문의하세요.");
+      });
   };
+  
 
   useEffect(() => {
     document.body.classList.add("signup-page-body");
@@ -223,25 +278,28 @@ const Signup = () => {
 
   return (
     <div className="signup-container">
-      <h1 className="signup-title">
-        소담<span className="signup-highlight">365</span>
-      </h1>
-      {/* 탭 버튼 */}
-      <div className="signup-buttons">
-        <button onClick={() => setSelectedTab("business")} className={selectedTab === "business" ? "active" : ""}>
-          사업자 회원
-        </button>
-        <button onClick={() => setSelectedTab("general")} className={selectedTab === "general" ? "active" : ""}>
-          일반 회원
-        </button>
-      </div>
+    <h1 className="signup-title">
+      소담<span className="signup-highlight">365</span>
+    </h1>
 
+    {/* 소담 365 밑에 구분선 추가 */}
+    <div className="signup-divider"></div>  {/* 구분선 추가 */}
+
+    {/* 탭 버튼 */}
+    <div className="signup-buttons">
+      <button onClick={() => setSelectedTab("business")} className={selectedTab === "business" ? "active" : ""}>
+        사업자 회원
+      </button>
+      <button onClick={() => setSelectedTab("general")} className={selectedTab === "general" ? "active" : ""}>
+        일반 회원
+      </button>
+    </div>
       {/* 일반 회원가입 폼 */}
       {selectedTab === "general" && (
         <form onSubmit={handleSubmit}>
           <div className="input-container">
             <label>아이디</label>
-            <input type="text" name="nUserid" ref={refs.nUserid} value={formData.nUserid} onChange={handleChange} />
+            <input type="text" name="n_userid" ref={refs.n_userid} value={formData.n_userid} onChange={handleChange} />
             <button type="button" onClick={handleDuplicateCheck}>중복확인</button>
           </div>
           {isIdAvailable === false && <div className="error-msg">아이디가 이미 존재합니다.</div>}
@@ -249,17 +307,17 @@ const Signup = () => {
 
           <div className="input-container">
             <label>비밀번호</label>
-            <input type="password" name="nPassword" ref={refs.nPassword} value={formData.nPassword} onChange={handleChange} />
+            <input type="password" name="password" ref={refs.password} value={formData.password} onChange={handleChange} />
           </div>
 
           <div className="input-container">
             <label>비밀번호 확인</label>
-            <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword}/>
+            <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword} onChange={handleChange}/>
           </div>
 
           <div className="input-container">
             <label>이름</label>
-            <input type="text" name="nName" ref={refs.nName} value={formData.nName} onChange={handleChange} />
+            <input type="text" name="name" ref={refs.name} value={formData.name} onChange={handleChange} />
           </div>
 
           <div className="input-container">
@@ -269,17 +327,17 @@ const Signup = () => {
 
           <div className="input-container">
             <label>이메일</label>
-            <input type="email" name="nEmail" ref={refs.nEmail} value={formData.nEmail} onChange={handleChange} />
+            <input type="email" name="email" ref={refs.email} value={formData.email} onChange={handleChange} />
           </div>
 
           <div className="input-container">
             <label>전화번호</label>
-            <input type="text" name="nPhone1" ref={refs.nPhone1} value={formData.nPhone1} onChange={handleChange} />
+            <input type="number" name="phone1" ref={refs.phone1} value={formData.phone1} onChange={handleChange} />
           </div>
 
           <div className="input-container">
             <label>휴대전화</label>
-            <input type="text" name="nPhone2" ref={refs.nPhone2} value={formData.nPhone2} onChange={handleChange} />
+            <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} />
           </div>
 
           <button type="submit" className="submit"   onClick={handleNomalSingup} >가입</button>
@@ -319,7 +377,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>사업자번호</label>
-            <input type="text" name="ownernum" ref={refs1.ownernum} value={formData1.ownernum} onChange={handleChange1} />
+            <input type="number" name="ownernum" ref={refs1.ownernum} value={formData1.ownernum} onChange={handleChange1} />
           </div>
 
           <div className="input-container">
@@ -334,12 +392,12 @@ const Signup = () => {
 
           <div className="input-container">
             <label>전화번호</label>
-            <input type="text" name="phone1" ref={refs1.phone1} value={formData1.phone1} onChange={handleChange1} />
+            <input type="number" name="phone1" ref={refs1.phone1} value={formData1.phone1} onChange={handleChange1} />
           </div>
 
           <div className="input-container">
             <label>휴대전화</label>
-            <input type="text" name="phone2" ref={refs1.phone2} value={formData1.phone2} onChange={handleChange1} />
+            <input type="number" name="phone2" ref={refs1.phone2} value={formData1.phone2} onChange={handleChange1} />
           </div>
 
           <button type="submit" className="submit" onClick={handleSingup}>가입</button>

@@ -1,18 +1,8 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
-  // 중복확인 함수
-  const handleDuplicateCheck = () => {
-    fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=${formData.p_title}`)
-      .then(response => response.json())
-      .then(data => {
-        // 처리 내용
-      })
-      .catch(error => {
-        console.error("중복 확인 오류 발생:", error);
-      });
-  };
-
+  const navigate = useNavigate();
   // 상품 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     p_title: "",
@@ -23,6 +13,7 @@ const ProductRegister = () => {
 
   // 오류 메시지 상태
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
@@ -32,11 +23,30 @@ const ProductRegister = () => {
     p_link: useRef(null),
   };
 
+  // 금액 입력 시 쉼표 추가
+  const formatPrice = (value) => {
+    return value
+      .replace(/[^0-9]/g, '') // 숫자가 아닌 모든 문자를 제거
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 3자리마다 쉼표 추가
+  };
+
   // 폼 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // 금액 입력 시 쉼표 추가
+    if (name === "p_price") {
+      const formattedPrice = formatPrice(value);
+      setFormData({ ...formData, [name]: formattedPrice });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+
+  // // 파일 첨부 처리
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   setFormData({ ...formData });
+  // };
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
@@ -73,11 +83,57 @@ const ProductRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleProductInsert = async (e) => {
+    e.preventDefault();
+  
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+  
+    try {
+      const formDataToSend = {
+        p_title: formData.p_title,
+        p_price: formData.p_price.replace(/,/g, ""), // 쉼표 제거
+        p_contents: formData.p_contents,
+        p_link: formData.p_link,
+      };
+  
+      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json", // ✅ JSON 데이터 전송
+        },
+        body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
+      });
+  
+      if (!response.ok) {
+        throw new Error("등록에 실패했습니다.");
+      }
+  
+      setMessage("성공적으로 등록되었습니다.");
+      setFormData({
+        p_title: "",
+        p_price: "",
+        p_contents: "",
+        p_link: "",
+      });
+  
+      navigate("/productBoardList");
+    } catch (error) {
+      setErrors(error.message);
+      console.error("상품 등록 오류:", error);
+    }
+  };
+  
+
   // 폼 제출 시 호출되는 함수
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      alert("상품이 등록되었습니다.");
+      alert("등록되었습니다.");
     } else {
       alert("빈칸을 확인해주세요.");
     }
@@ -107,7 +163,7 @@ const ProductRegister = () => {
           <div className="register-row">
             <div className="register-label">금액</div>
             <input
-              type="number"
+              type="text"
               className="register-text"
               name="p_price"
               id="p_price"
@@ -143,11 +199,23 @@ const ProductRegister = () => {
               onChange={handleChange}
             />
           </div>
+
+          {/* 이미지 파일 첨부 */}
+          <div className="register-row">
+            <div className="register-label">사진 첨부</div>
+            <input
+              type="file"
+              className="register-text"
+              name="p_image"
+              id="p_image"
+              ref={refs.p_image}
+              // onChange={handleFileChange}
+            />
+          </div>
         </div>
 
         {/* 제출 버튼 */}
-        <button className="register-submit" type="submit" 
-         onClick={handleDuplicateCheck} >
+        <button className="register-submit" type="button" onClick={handleProductInsert}>
           등록
         </button>
       </div>

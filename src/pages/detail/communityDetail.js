@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./detail.css";
 
 function CommunityDetail() {
@@ -10,133 +11,214 @@ function CommunityDetail() {
   const [c_title, setTitle] = useState(""); // 게시글 제목
   const [c_content, setContent] = useState(""); // 게시글 내용
   const c_contents = "자유게시판"; // 실제 데이터와 연결 필요
-
-  // 찜 상태 (DB 연결 전에는 localStorage 사용)
+  const { id } = useParams(); // URL에서 productId 파라미터 가져오기
+  const [errors, setErrors] = useState("");
+  const [message, setMessage] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // 댓글을 저장할 상태
-  const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const navigate = useNavigate();
 
-  // 1️⃣ 마운트 시 localStorage에서 찜 여부 확인
+  // 로그인한 유저 정보
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  // 댓글 수정 관련 상태
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedComment, setEditedComment] = useState("");
+
+  const [communityDetails, setCommunityDetails] = useState({
+    c_title: "제목",
+    c_content: "설명",
+    authorName: "",
+    authorType: "",
+    createdAt: "",
+    id: "",
+  });
+
+  const commentInputRef = useRef(null); // 댓글 수정 입력 필드를 위한 ref
+
   useEffect(() => {
+    // JWT에서 사용자 ID 추출 (실제 사용 시 디코딩 필요)
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      const decoded = JSON.parse(atob(token.split(".")[1])); // JWT 디코딩
+      setCurrentUserId(decoded.userId);
+    }
+
     const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
     setIsBookmarked(savedBookmarks.includes(c_contents));
 
-    // 댓글 목록 및 게시글 내용 불러오기 (예시로 API 요청)
-    fetch("http://192.168.0.102:8080/api/community/details") // 예시 API URL
-      .then((response) => response.json())
-      .then((data) => {
-        setTitle(data.title || "자유게시판 제목");
-        setContent(data.content || "자유게시판 내용");
-        setComments(data.comments || []);
-      })
-      .catch((error) => {
-        console.error("게시글 및 댓글 데이터 가져오기 실패:", error);
-      });
-
-    // 중복 아이디 확인 API 호출 (예시로 테스트 아이디 사용)
-    fetch(`http://192.168.0.102:8080/api/users/check-duplicate?userid=testuser123`)
-      .then(response => response.json())
-      .then(data => {
-        if (data) {
-          setIsIdAvailable(false);
-          alert("이미 사용 중인 아이디입니다.");
-        } else {
-          setIsIdAvailable(true);
-          alert("사용 가능한 아이디입니다.");
-        }
-      })
-      .catch(error => {
-        console.error("중복 확인 오류 발생:", error);
-      });
+    fetchCommunityDetails();
+    fetchData();
   }, []);
 
-  // 2️⃣ 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
-  const handleBookmarkClick = () => {
-    const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`http://192.168.0.102:8080/api/comment/byCommunity/${id}`);
+      if (!response.ok) throw new Error("댓글 조회 실패");
 
-    if (isBookmarked) {
-      // 찜 해제 (배열에서 삭제)
-      const updatedBookmarks = savedBookmarks.filter((item) => item !== c_contents);
-      localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
-      setIsBookmarked(false);
-    } else {
-      // 찜 추가 (배열에 추가)
-      savedBookmarks.push(c_contents);
-      localStorage.setItem("bookmarks", JSON.stringify(savedBookmarks));
-      setIsBookmarked(true);
+      const result = await response.json();
+      setComments(result);
+    } catch (error) {
+      console.error("댓글 조회 오류:", error);
+      setErrors(error.message);
     }
   };
 
-  // 댓글 등록 함수
-  // const handleCommentSubmit = () => {
-  //   if (c_comment.trim() === "") return;
-  //   const newComment = {
-  //     id: Date.now(), 
-  //     author: "익명",
-  //     content: c_comment,
-  //     date: new Date().toLocaleDateString(),
-  //   };
-  //   setComments([...c_comments, newComment]);
-  //   setComment(""); // 입력창 초기화
-  // };
+  const fetchCommunityDetails = async () => {
+    try {
+      const response = await fetch(`http://192.168.0.102:8080/api/community/communityDetail/${id}`);
+      if (!response.ok) throw new Error("게시글 조회 실패");
 
-  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
-
-  // 목록 버튼 클릭 시 이동하는 함수
-  const handleGoToList = () => {
-    navigate("/communityBoardList"); // "/communityBoardList" 페이지로 이동
+      const data = await response.json();
+      setCommunityDetails({
+        c_title: data.c_title,
+        c_content: data.c_content,
+        authorName: data.authorName,
+        authorType: data.authorType,
+        createdAt: data.createdAt,
+        id: data.id,
+      });
+    } catch (error) {
+      console.error("게시글 가져오기 실패:", error);
+    }
   };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://192.168.0.102:8080/api/comment/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          c_title: communityDetails.c_title,
+          c_comment,
+          authorName: communityDetails.authorName,
+          authorType: communityDetails.authorType,
+          communityId: communityDetails.id,
+        }),
+      });
+
+      if (!response.ok) throw new Error("등록 실패");
+
+      setComment("");
+      fetchData();
+    } catch (error) {
+      console.error("댓글 등록 오류:", error);
+    }
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await fetch(`http://192.168.0.102:8080/api/comment/update/${commentId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ c_comment: editedComment }),
+      });
+
+      if (!response.ok) throw new Error("댓글 수정 실패");
+
+      setEditingCommentId(null);
+      setEditedComment(""); // 수정 후 인풋 초기화
+      fetchData();
+    } catch (error) {
+      console.error("댓글 수정 오류:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await fetch(`http://192.168.0.102:8080/api/comment/delete/${commentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("댓글 삭제 실패");
+
+      fetchData();
+    } catch (error) {
+      console.error("댓글 삭제 오류:", error);
+    }
+  };
+
+  // 댓글 수정 버튼 클릭 시 포커스 설정
+  useEffect(() => {
+    if (editingCommentId !== null && commentInputRef.current) {
+      commentInputRef.current.focus();
+    }
+  }, [editingCommentId]); // editingCommentId가 변경될 때마다 실행
 
   return (
     <div className="detail-container">
       <div className="detail-content">
         <h2 className="detail-title">자유게시판</h2>
         <hr />
-
-        <div className="detail-header">
-          <FontAwesomeIcon
-            icon={faBookmark}
-            className={`bookmark-icon ${isBookmarked ? "active" : ""}`}
-            onClick={handleBookmarkClick}
-          />
+        <div className="detail-author-date">
+          <span className="author">
+            <FontAwesomeIcon icon={faUser} /> &nbsp;
+            {communityDetails.authorName}&nbsp;
+          </span>
+          <span className="created-date">
+            작성일: {new Date(communityDetails.createdAt).toLocaleDateString()}
+          </span>
         </div>
 
         <div className="detail-box">
           <div className="detail-row">
             <div className="detail-label">제목</div>
-            <input
-              type="text"
-              className="detail-text"
-              name="c_title"
-              id="c_title"
-              value={c_title}
-              disabled={true}
-            />
+            <input type="text" className="detail-text" value={communityDetails.c_title} disabled />
           </div>
           <div className="detail-row content-row">
             <div className="detail-label">내용</div>
-            <textarea
-              className="detail-text large"
-              name="c_contents"
-              id="c_contents"
-              value={c_content}
-              disabled={true}
-            ></textarea>
+            <textarea className="detail-text large" value={communityDetails.c_content} disabled />
           </div>
         </div>
 
-        {/* 댓글 목록 */}
         <h3 className="detail-comment-list-title">댓글 목록</h3>
         <div className="detail-comment-table">
           {c_comments.map((c) => (
-            <div key={c.id} className="detail-comment-card">
+            <div key={c.id} className="detail-comment-card" style={{ position: "relative" }}>
               <div className="detail-comment-author-date">
-                <span>{c.author}</span> | <span>{c.date}</span>
+                <FontAwesomeIcon icon={faUser} /> {c.authorName} | {new Date(c.createdAt).toLocaleDateString()}
               </div>
               <div className="detail-comment-content">
-                {c.content}
+                {editingCommentId === c.id ? (
+                  <input
+                    ref={commentInputRef} // 댓글 수정 입력에 ref 추가
+                    type="text"
+                    value={editedComment}
+                    onChange={(e) => setEditedComment(e.target.value)}
+                  />
+                ) : (
+                  c.c_comment
+                )}
               </div>
+              {/* 현재 로그인한 사용자와 댓글 작성자가 동일할 때만 수정/삭제 버튼을 보이도록 조건 추가 */}
+              {c.authorId === currentUserId && (
+                <div className="comment-actions">
+                  {editingCommentId === c.id ? (
+                    <button className="save-button" onClick={() => handleUpdateComment(c.id)}>저장</button>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faPen} onClick={() => setEditingCommentId(c.id)} />
+                      <FontAwesomeIcon icon={faTrash} onClick={() => handleDeleteComment(c.id)} />
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -154,20 +236,16 @@ function CommunityDetail() {
           />
           <button
             className="detail-submit-comment-btn"
-            // onClick={handleCommentSubmit}
+            onClick={handleCommentSubmit}
           >
             등록
           </button>
         </div>
 
-        <button className="detail-button" onClick={handleGoToList}>
-          목록
-        </button>
+        <button className="detail-button" onClick={() => navigate("/communityBoardList")}>목록</button>
       </div>
     </div>
   );
 }
 
 export default CommunityDetail;
-
- 
