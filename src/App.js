@@ -33,8 +33,7 @@ import BusinessUpdate from "./pages/update/BusinessUpdate";
 import CommunityUpdate from "./pages/update/CommunityUpdate";
 import NoticeUpdate from "./pages/update/NoticeUpdate";
 import QAUpdate from "./pages/update/QAUpdate";
-import BusinessPasswordPopup from "./components/BusinessPasswordPopup";
-import PersonPasswordPopup from "./components/PersonPasswordPopup";
+import PasswordPopup from "./components/PasswordPopup";
 
 
 
