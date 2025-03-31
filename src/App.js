@@ -33,8 +33,6 @@ import BusinessUpdate from "./pages/update/BusinessUpdate";
 import CommunityUpdate from "./pages/update/CommunityUpdate";
 import NoticeUpdate from "./pages/update/NoticeUpdate";
 import QAUpdate from "./pages/update/QAUpdate";
-import PasswordPopup from "./components/PasswordPopup";
-
 
 
 function App() {
@@ -53,6 +51,7 @@ function App() {
           <Route path="/main" element={<><Nav /><Main /><Footer /></>} />
           <Route path="/businessMypage" element={<><Nav /><BusinessMyPage /><Footer /></>} />
           <Route path="/personMypage" element={<><Nav /><PersonMyPage /><Footer /></>} />
+          <Route path="/password-popup" element={<PasswordPopup />} />
           <Route path="/password-popup" element={<BusinessPasswordPopup />} />
           <Route path="/password-popup" element={<PersonPasswordPopup />} />
           <Route path="/businessRegister" element={<><Nav /><BusinessRegister /><Footer /></>} />
