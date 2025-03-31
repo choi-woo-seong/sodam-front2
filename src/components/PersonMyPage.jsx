@@ -2,11 +2,24 @@ import React, { useState, useEffect } from "react";
 import "../styles/MyPage.css"; 
 import { useNavigate } from "react-router-dom"; 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import PersonPasswordPopup from "./PersonPasswordPopup"; // 새로 만든 모달 방식의 비밀번호 변경창 import
 
 function PersonMyPage() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState("");
     const [message, setMessage] = useState("");
+    const [errors, setErrors] = useState({});
+    const [isPasswordPopupOpen, setIsPasswordPopupOpen] = useState(false); // 모달 상태 추가
+    const [formData, setFormData] = useState({
+        n_userid: "",
+        password: "",
+        confirmPassword: "",
+        name: "",
+        email: "",
+        phone1: "",
+        phone2: "",
+        address:""
+    });
+    
 
     const fetchData = async () => {
         try {
@@ -16,78 +29,136 @@ function PersonMyPage() {
                 return;
             }
 
-            const response = await fetch("http://192.168.0.102:8080/api/users/normal/info", {
+            const response = await fetch(
+                "http://192.168.0.102:8080/api/users/normal/info", 
+                {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
-            });
+            }
+        );
 
             if (!response.ok) {
-                throw new Error("상품 조회에 실패했습니다.");
+                throw new Error("회원정보 조회에 실패했습니다.");
             }
 
             const result = await response.json();
             console.log(result);
             setFormData(result);
-
         } catch (error) {
-            console.error("상품 조회 오류:", error.message);
+            console.error("회원정보 조회 오류:", error.message);
         }
     };
-
     useEffect(() => {
         fetchData();
-        
-        // 팝업 창에서 비밀번호 변경 데이터를 받을 이벤트 리스너 등록
-        window.addEventListener("message", receivePasswordData, false);
-
-        return () => {
-            window.removeEventListener("message", receivePasswordData, false);
-        };
     }, []);
 
-    // 자식 창에서 비밀번호 데이터를 받아오는 함수
-    const receivePasswordData = (event) => {
-        if (event.origin !== window.location.origin) return; // 보안 체크
-
-        const { n_password } = event.data;
-        if (n_password) {
-            setFormData((prevData) => ({
-                ...prevData,
-                n_password: n_password
-            }));
-            alert("비밀번호가 변경되었습니다.");
-        }
-    };
-
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({ 
+            ...formData,
+             [e.target.name]: e.target.value 
+            });
     };
 
-    const handleSubmit = (e) => {
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.email) 
+            newErrors.email = "이메일을 입력하세요.";
+        if (!formData.phone1) 
+            newErrors.phone1 = "연락처1을 입력하세요.";
+        if (!formData.phone2) 
+            newErrors.phone2 = "연락처2를 입력하세요.";
+        setErrors(newErrors);
+
+        return Object
+            .keys(newErrors)
+            .length === 0;
+    };
+    
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const confirmUpdate = window.confirm("수정하시겠습니까?");
-        if (confirmUpdate) {
-            console.log("수정된 데이터:", formData);
+        if (validateForm()) {
+            const token = localStorage.getItem("jwt");
+            try {
+                const response = await fetch(
+                    `http://192.168.0.102:8080/api/users/normal/update`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        credentials: "include",
+                        body: JSON.stringify(formData),
+                        mode: "cors"
+                    }
+                );
+
+                if (!response.ok) 
+                    throw new Error("수정 실패");
+                
+                // 알림 메시지 표시
+                alert("수정이 완료되었습니다.");
+                navigate(""); // 수정 후 상세 페이지로 이동
+            } catch (error) {
+                console.error("수정 중 오류 발생:", error);
+                alert("수정 중 오류가 발생했습니다.");
+            }
+        } else {
+            alert("빈칸을 확인해주세요.");
+        }
+    };
+    const setDelete = async (e) => {
+        if (validateForm()) {
+            const token = localStorage.getItem("jwt");
+            try {
+                const response = await fetch(
+                    `http://192.168.0.102:8080/api/users/normal/delete`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+
+                if (!response.ok) 
+                    throw new Error("수정 실패");
+                
+                // 알림 메시지 표시
+                alert("탈퇴가 완료되었습니다.");
+                navigate("/personLogin"); // 수정 후 상세 페이지로 이동
+            } catch (error) {
+                console.error("탈퇴 중 오류 발생:", error);
+                alert("탈퇴 중 오류가 발생했습니다.");
+            }
+        } else {
+            alert("빈칸을 확인해주세요.");
         }
     };
 
+     // 🚀 handleDelete 함수 추가 (탈퇴 버튼 동작)
     const handleDelete = () => {
         const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
         if (confirmDelete) {
-            console.log("회원 탈퇴 진행");
+            setDelete();
         }
     };
 
-    // 비밀번호 변경 팝업 창 열기
+    // 비밀번호 변경 모달 열기
     const openPasswordPopup = () => {
-        window.open(
-            "/password-popup",
-            "비밀번호 변경",
-            "width=400,height=300,left=500,top=200"
-        );
+        setIsPasswordPopupOpen(true);
+    };
+
+    // 비밀번호 변경 후 상태 업데이트
+    const handlePasswordChange = (newPassword) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            n_password: newPassword
+        }));
     };
 
     return (
@@ -115,10 +186,9 @@ function PersonMyPage() {
                     <label>이름</label>
                     <input 
                         type="text" 
-                        name="n_name" 
-                        value={formData.n_name} 
+                        name="name" 
+                        value={formData.name} 
                         onChange={handleChange} 
-                        readOnly 
                     />
                 </div>
 
@@ -126,17 +196,28 @@ function PersonMyPage() {
                     <label>이메일 수정</label>
                     <input 
                         type="email" 
-                        name="n_email" 
-                        value={formData.n_email} 
+                        name="email" 
+                        value={formData.email} 
                         onChange={handleChange} 
                     />
                 </div>
+
+                <div className="input-group">
+                    <label>주소 수정</label>
+                    <input 
+                        type="text" 
+                        name="address" 
+                        value={formData.address} 
+                        onChange={handleChange} 
+                    />
+                </div>
+
                 <div className="input-group">
                     <label>연락처1 수정</label>
                     <input 
                         type="text" 
-                        name="n_phone1" 
-                        value={formData.n_phone1} 
+                        name="phone1" 
+                        value={formData.phone1} 
                         onChange={handleChange} 
                     />
                 </div>
@@ -144,34 +225,27 @@ function PersonMyPage() {
                     <label>연락처2 수정</label>
                     <input 
                         type="text" 
-                        name="n_phone2" 
-                        value={formData.n_phone2} 
+                        name="phone2" 
+                        value={formData.phone2} 
                         onChange={handleChange} 
                     />
                 </div>
 
-                <div className="input-group">
-                    <button type="button" className="password-btn" onClick={openPasswordPopup}>
-                        비밀번호 변경
-                    </button>
-                </div>
 
                 <div className="btn1">
                     <button type="button" className="submit-btn1" onClick={handleDelete}>탈퇴</button>
                     <button type="submit" className="submit-btn2">수정</button>
                 </div>
             </form>
+
+            {/* 비밀번호 변경 모달 */}
+            <PersonPasswordPopup
+                isOpen={isPasswordPopupOpen}
+                closeModal={() => setIsPasswordPopupOpen(false)}
+                onPasswordChange={handlePasswordChange}
+            />
         </div>
     );
-    
 }
-const openPasswordPopup = () => {
-    window.open(
-        "/password-popup",
-        "비밀번호 변경",
-        "width=400,height=300,left=500,top=200"
-    );
-};
-
 
 export default PersonMyPage;
