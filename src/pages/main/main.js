@@ -7,6 +7,7 @@ function Main({ apiEndpoints }) {
   const [suggestions, setSuggestions] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(-1); // 🔹 선택된 항목 인덱스
 
   const [data, setData] = useState({
     product: [],
@@ -20,21 +21,29 @@ function Main({ apiEndpoints }) {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const navigate = useNavigate();
 
-  // 🔹 검색 기능
-  const handleSearch = () => {
-    if (searchTerm.trim() === "") {
-      alert("검색어를 입력해주세요!");
+  // 🔹 검색어 입력 시 연관 검색어 자동 업데이트
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSuggestions([]);
       return;
     }
-    console.log("검색어 : ", searchTerm);
-  };
+
+    fetch(`http://192.168.0.102:8080/api/search/all?title=${encodeURIComponent(searchTerm)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setSuggestions(data); // 연관 검색어 업데이트
+        setSelectedIndex(-1); // 새로운 검색 시 선택 초기화
+      })
+      .catch((err) => {
+        console.error("연관 검색어 불러오기 오류:", err);
+      });
+  }, [searchTerm]);
 
   // 🔹 API 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("jwt");
-
         if (!token) {
           setMessage("로그인이 필요합니다.");
           return;
@@ -53,7 +62,6 @@ function Main({ apiEndpoints }) {
         }
 
         const result = await response.json();
-        console.log(result);
         setData(result);
       } catch (error) {
         setErrors(error.message);
@@ -64,58 +72,56 @@ function Main({ apiEndpoints }) {
     fetchData();
   }, []);
 
+  // 🔹 상세 페이지로 이동 + 최근 본 항목 저장
   const handleNavigate = (path, item) => {
     const newItem = {
-      id: item.id || item.no, 
-      title: item.title || item.p_title || item.b_title || item.c_title || item.n_title || item.finPrdNm || item.finPrdNm, // 금융(gov) 항목에 g_title 사용
+      id: item.id || item.no,
+      title: item.title || item.p_title || item.b_title || item.c_title || item.n_title || item.finPrdNm,
       path,
     };
-  
-    // 중복 제거 후 최신 3개까지만 유지
+
+    // 중복 제거 후 최대 5개 유지
     const updatedList = [newItem, ...recentlyViewed.filter((i) => i.id !== newItem.id)].slice(0, 5);
-  
-    // 상태 업데이트 및 localStorage 저장
+
     setRecentlyViewed(updatedList);
     localStorage.setItem("recentlyViewed", JSON.stringify(updatedList));
-  
     navigate(`${path}/${newItem.id}`);
   };
-  
-  // 🔹 페이지가 로드될 때 localStorage에서 최근 본 항목 불러오기
+
+  // 🔹 최근 본 항목 불러오기
   useEffect(() => {
     const storedViewed = localStorage.getItem("recentlyViewed");
     setRecentlyViewed(storedViewed ? JSON.parse(storedViewed) : []);
   }, []);
 
-  // 🔹 추천 항목 필터링
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSuggestions([]);
-      return;
+  // 🔹 키보드 입력 처리 (화살표 및 Enter)
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prevIndex) => (prevIndex < suggestions.length - 1 ? prevIndex + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : suggestions.length - 1));
+    } else if (e.key === "Enter") {
+      if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+        handleNavigate(`/${suggestions[selectedIndex].targetPgm}`, suggestions[selectedIndex]);
+      } else if (searchTerm.trim()) {
+        handleNavigate("/search", { title: searchTerm });
+      }
     }
-
-    const allItems = [...data.product, ...data.biz, ...data.gov, ...data.community, ...data.notice, ...data.question];
-
-    const filteredSuggestions = allItems.filter((item) =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    setSuggestions(filteredSuggestions);
-  }, [searchTerm]);
+  };
 
   return (
     <div className="main-container">
-      {/* 검색창 */}
-      <div className="search-container">
+        {/* 검색창 */}
+        <div className="search-container">
         <input
           type="text"
           className="search-input"
           placeholder="검색어를 입력하세요"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+          onKeyDown={handleKeyDown} // 🔹 키보드 입력 이벤트 등록
         />
-        <button className="search-button" onClick={handleSearch}>
+        <button className="search-button" onClick={() => handleNavigate("/search", { title: searchTerm })}>
           <i className="fas fa-search"></i>
         </button>
       </div>
@@ -124,15 +130,19 @@ function Main({ apiEndpoints }) {
       {searchTerm && suggestions.length > 0 && (
         <div className="suggestions-list">
           <ul>
-            {suggestions.map((item) => (
-              <li key={item.id} onClick={() => handleNavigate("/detail", item)}>
+            {suggestions.map((item, index) => (
+              <li
+                key={item.id}
+                className={index === selectedIndex ? "active" : ""}
+                onMouseEnter={() => setSelectedIndex(index)}
+                onClick={() => handleNavigate(`/${item.targetPgm}`, item)}
+              >
                 {item.title}
               </li>
             ))}
           </ul>
         </div>
       )}
-
       {/* 최근 등록 항목 */}
       <div className="content-container">
         <div className="recent-items">
@@ -210,15 +220,12 @@ function Main({ apiEndpoints }) {
 
             {/* Q&A */}
             <div className="card">
-              <div className="card-header" onClick={() => navigate('/QABoardList')}>
-                Q&A
-                <button className="expand-icon" onClick={() => navigate('/QABoardList')}>
-                  +
-                </button>
+              <div className="card-header" onClick={() => navigate("/QABoardList")}>
+                Q&A <button className="expand-icon">+</button>
               </div>
               <ul>
                 {data.question.map((item) => (
-                  <li key={item.id} onClick={() => handleNavigate('/QADetail', item)}>
+                  <li key={item.id} onClick={() => handleNavigate("/QADetail", item)}>
                     {item.title}
                   </li>
                 ))}

@@ -14,9 +14,6 @@ const QARegister = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
 
-  // 중복 확인 상태
-  const [isDuplicate, setIsDuplicate] = useState(false);
-
   // 각 입력 필드에 대한 ref 생성
   const refs = {
     title: useRef(null),
@@ -46,16 +43,22 @@ const QARegister = () => {
 
   const handleQAInsert = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    // 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시 
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
 
     if (!token) {
-      setMessage("로그인이 필요합니다.");
+      alert("로그인이 필요합니다.");
       return;
     }
 
     try {
-      // FormData 객체로 폼 데이터와 파일을 전송
+      // FormData 객체로 폼 데이터 전송
       const formDataToSend = {
         title: formData.title,
         content: formData.content,
@@ -86,7 +89,7 @@ const QARegister = () => {
 
     } catch (error) {
       setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
-      console.error(" 등록 오류:", error);
+      console.error("등록 오류:", error);
 
       // 등록 실패 시 바로 alert 표시
       alert("등록 실패: " + error.message); // 실패 시 alert 표시
@@ -111,7 +114,6 @@ const QARegister = () => {
               value={formData.title}
               onChange={handleChange}
             />
-            {errors.title && <span className="error">제목을 입력하세요.</span>}
           </div>
 
           {/* 내용 입력 */}
@@ -125,7 +127,6 @@ const QARegister = () => {
               value={formData.content}
               onChange={handleChange}
             />
-            {errors.content && <span className="error">내용을 입력하세요.</span>}
           </div>
         </div>
 

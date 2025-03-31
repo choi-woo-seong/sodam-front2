@@ -42,6 +42,13 @@ const CommunityRegister = () => {
 
   const handleCommunityInsert = async (e) => {
     e.preventDefault();
+
+    // 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+
     console.log(formData);
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
 
@@ -87,23 +94,6 @@ const CommunityRegister = () => {
     }
   };
 
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      // 모든 필드가 채워졌다면 등록 처리
-      alert("등록되었습니다.");
-      setFormData({
-        c_title: "",
-        c_content: "",
-      });
-    } else {
-      // 빈칸이 있을 경우 얼럿 표시
-      alert("빈칸을 확인해주세요.");
-    }
-  };
-
   return (
     <div className="register-container">
       <div className="register-content">
@@ -122,19 +112,21 @@ const CommunityRegister = () => {
               value={formData.c_title}
               onChange={handleChange}
             />
+            {errors.c_title && <span className="error">제목을 입력하세요.</span>}
           </div>
 
           {/* 내용 입력 */}
           <div className="register-row content-row">
             <div className="register-label">내용</div>
             <textarea
-              className="register-text large"
+              className="register-text large" 
               name="c_content"
               id="c_content"
               ref={refs.c_content}
               value={formData.c_content}
               onChange={handleChange}
             />
+            {errors.c_content && <span className="error">내용을 입력하세요.</span>}
           </div>
         </div>
 

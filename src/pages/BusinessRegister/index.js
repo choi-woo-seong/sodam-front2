@@ -44,8 +44,34 @@ const BusinessRegister = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // 폼 제출 시 빈칸 확인 함수
+  const validateForm = () => {
+    let hasError = false;
+
+    // 각 필드가 비어있는지 체크
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key] && key !== "b_image") {  // 이미지 필드는 필수가 아니므로 제외
+        hasError = true;
+      }
+    });
+
+    // 빈칸이 있으면 얼럿을 띄우고 반환
+    if (hasError) {
+      alert("빈칸을 확인해주세요.");
+      return true;  // 유효성 검사 실패
+    }
+
+    return false; // 유효성 검사 성공
+  };
+
+  // 비즈니스 등록 함수
   const handleBusinessInsert = (e) => {
     e.preventDefault();
+
+    // 폼 유효성 검사
+    if (validateForm()) {
+      return; // 유효성 검사 실패 시 등록을 진행하지 않음
+    }
 
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
     if (!token) {
@@ -76,7 +102,7 @@ const BusinessRegister = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("등록에 실패했습니다.");  // 실패 시 오류 발생
+          throw new Error("등록에 실패했습니다.");
         }
         return response.json(); // 서버 응답을 JSON으로 반환
       })
@@ -92,7 +118,7 @@ const BusinessRegister = () => {
 
         // 성공 시 오류 메시지 초기화 후 등록 완료 알림 표시
         setErrors({});
-        alert("등록되었습니다."); // 성공 시 alert 표시
+        alert("등록되었습니다.");
         navigate("/businessBoardList");
       })
       .catch((error) => {
@@ -101,24 +127,8 @@ const BusinessRegister = () => {
         console.error("비즈니스 등록 오류:", error);
 
         // 등록 실패 시 바로 알림 표시
-        alert("등록 실패: " + error.message); // 실패 시 alert 표시
+        alert("등록 실패: " + error.message);
       });
-  };
-
-  // 폼 제출 시 빈칸 확인 함수
-  const handleSubmit = () => {
-    let hasError = false;
-
-    // 각 필드가 비어있는지 체크
-    Object.keys(formData).forEach((key) => {
-      if (!formData[key] && key !== "b_image") {  // 이미지 필드는 필수가 아니므로 제외
-        if (!hasError) {
-          // 첫 번째 빈 필드에 포커스를 맞추기
-          refs[key].current.focus();
-          hasError = true;
-        }
-      }
-    });
   };
 
   return (
@@ -173,18 +183,6 @@ const BusinessRegister = () => {
               ref={refs.b_link} 
               value={formData.b_link} 
               onChange={handleChange} 
-            />
-          </div>
-
-          {/* 이미지 첨부 입력 */}
-          <div className="register-row">
-            <div className="register-label">사진 첨부</div>
-            <input 
-              type="file" 
-              className="register-text" 
-              name="b_image" 
-              id="b_image" 
-              ref={refs.b_image} 
             />
           </div>
         </div>

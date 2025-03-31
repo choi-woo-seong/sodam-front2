@@ -81,6 +81,12 @@ const ProductRegister = () => {
   const handleProductInsert = async (e) => {
     e.preventDefault();
   
+    // 폼 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+  
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
     if (!token) {
       setMessage("로그인이 필요합니다.");
@@ -146,7 +152,6 @@ const ProductRegister = () => {
               value={formData.p_title}
               onChange={handleChange}
             />
-            {errors.p_title && <span className="error">제목을 입력하세요.</span>}
           </div>
 
           {/* 금액 입력 */}
@@ -161,7 +166,6 @@ const ProductRegister = () => {
               value={formData.p_price}
               onChange={handleChange}
             />
-            {errors.p_price && <span className="error">금액을 입력하세요.</span>}
           </div>
 
           {/* 설명 입력 */}
@@ -175,7 +179,6 @@ const ProductRegister = () => {
               value={formData.p_contents}
               onChange={handleChange}
             />
-            {errors.p_contents && <span className="error">내용을 입력하세요.</span>}
           </div>
 
           {/* 링크 입력 */}
@@ -190,21 +193,9 @@ const ProductRegister = () => {
               value={formData.p_link}
               onChange={handleChange}
             />
-            {errors.p_link && <span className="error">링크를 입력하세요.</span>}
           </div>
 
-          {/* 이미지 파일 첨부 */}
-          <div className="register-row">
-            <div className="register-label">사진 첨부</div>
-            <input
-              type="file"
-              className="register-text"
-              name="p_image"
-              id="p_image"
-              ref={refs.p_image}
-              // onChange={handleFileChange}
-            />
-          </div>
+       
         </div>
 
         {/* 제출 버튼 */}
