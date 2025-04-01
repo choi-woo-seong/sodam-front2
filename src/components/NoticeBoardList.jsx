@@ -3,6 +3,8 @@ import { Link ,useNavigate} from "react-router-dom";
 import "../styles/BoardList.css";
 
 const NoticeBoardList = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
    const [data, setData] = useState([]);
     const [errors, setErrors] = useState("");
@@ -18,7 +20,7 @@ const NoticeBoardList = () => {
             return;
           }
 
-          const response = await fetch("http://192.168.0.102:8080/api/notice/searchAll", {
+          const response = await fetch(`${BASE_URL}/api/notice/searchAll`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

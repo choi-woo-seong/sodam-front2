@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const QARegister = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
   
   // Q&A 등록 폼 데이터 상태
@@ -64,7 +66,7 @@ const QARegister = () => {
         content: formData.content,
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/question/create", {
+      const response = await fetch(`${BASE_URL}/api/question/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`, // JWT 토큰 포함

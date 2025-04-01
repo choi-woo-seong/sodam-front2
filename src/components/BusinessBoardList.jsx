@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const BusinessBoardList = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
    const [data, setData] = useState([]);
     const [errors, setErrors] = useState("");
     const [message, setMessage] = useState("");
@@ -19,7 +20,7 @@ const BusinessBoardList = () => {
             return;
           }
   
-          const response = await fetch("http://192.168.0.102:8080/api/biz/searchAll", {
+          const response = await fetch(`${BASE_URL}/api/biz/searchAll`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

@@ -5,6 +5,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import BusinessPasswordPopup from "./BusinessPasswordPopup";
 
 function BusinessMyPage() {
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
@@ -30,8 +33,7 @@ function BusinessMyPage() {
                 return;
             }
 
-            const response = await fetch(
-                "http://192.168.0.102:8080/api/users/business/info",
+            const response = await fetch(`${BASE_URL}/api/users/business/info`,
                 {
                     method: "GET",
                     headers: {
@@ -118,7 +120,7 @@ function BusinessMyPage() {
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(
-                `http://192.168.0.102:8080/api/users/business/update`,
+                    `${BASE_URL}/api/users/business/update`,
                 {
                     method: "PUT",
                     headers: {
@@ -145,8 +147,7 @@ function BusinessMyPage() {
         if (validateForm()) {
             const token = localStorage.getItem("jwt");
             try {
-                const response = await fetch(
-                    `http://192.168.0.102:8080/api/users/business/delete`,
+                const response = await fetch(`http://192.168.0.102:8080/api/users/business/delete`,
                     {
                         method: "DELETE",
                         headers: {

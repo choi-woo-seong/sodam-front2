@@ -3,6 +3,8 @@ import "./main.css";
 import { useNavigate } from "react-router-dom";
 
 function Main({ apiEndpoints }) {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [errors, setErrors] = useState("");
@@ -28,7 +30,7 @@ function Main({ apiEndpoints }) {
       return;
     }
 
-    fetch(`http://192.168.0.102:8080/api/search/all?title=${encodeURIComponent(searchTerm)}`)
+    fetch(`${BASE_URL}/api/search/all?title=${encodeURIComponent(searchTerm)}`)
       .then((res) => res.json())
       .then((data) => {
         setSuggestions(data); // 연관 검색어 업데이트
@@ -49,7 +51,7 @@ function Main({ apiEndpoints }) {
           return;
         }
 
-        const response = await fetch("http://192.168.0.102:8080/api/main/recent-posts", {
+        const response = await fetch(`${BASE_URL}/api/main/recent-posts`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

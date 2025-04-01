@@ -5,6 +5,8 @@ import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons"; // faUse
 import "./detail.css";
 
 function ProductDetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate(); // 🔹 페이지 이동을 위한 useNavigate 사용
   const p_contents = "상품"; // 📌 실제 데이터와 연결 필요
 
@@ -33,7 +35,7 @@ function ProductDetail() {
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   const fetchProductDetails = async () => {
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`); // 예시 API URL
+      const response = await fetch(`${BASE_URL}/api/products/productDetail/${id}`); // 예시 API URL
       if (!response.ok) {
         throw new Error("상품 데이터 조회에 실패했습니다.");
       }
@@ -75,7 +77,7 @@ function ProductDetail() {
         targetPgm:"productDetail",
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -129,7 +131,7 @@ function ProductDetail() {
 
         console.log(formDataToSend)
     
-        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Signup.css";
 
 const Signup = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
 
   // 일반회원 입력 상태
@@ -112,7 +114,7 @@ const validatePhoneNumber = (phoneNumber) => {
       email: formData.email,
     };
     console.log(payload);
-    fetch("http://192.168.0.102:8080/email/send-code", {
+    fetch(`${BASE_URL}/email/send-code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +147,7 @@ const validatePhoneNumber = (phoneNumber) => {
       code: verificationCode,
     };
     console.log(payload);
-    fetch("http://192.168.0.102:8080/email/verify-code", {
+    fetch(`${BASE_URL}/email/verify-code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -187,7 +189,7 @@ const validatePhoneNumber = (phoneNumber) => {
       email: formData1.b_email,
     };
     console.log(payload);
-    fetch("http://192.168.0.102:8080/email/send-code", {
+    fetch(`${BASE_URL}/email/send-code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -220,7 +222,7 @@ const validatePhoneNumber = (phoneNumber) => {
       code: verificationCode,
     };
     console.log(payload);
-    fetch("http://192.168.0.102:8080/email/verify-code", {
+    fetch(`${BASE_URL}/email/verify-code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -382,7 +384,7 @@ const handleNomalSingup = (e) => {
       phone2: formData.phone2,
     };
 
-    fetch("http://192.168.0.102:8080/auth/register/nuser", {
+    fetch(`${BASE_URL}/auth/register/nuser`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -424,7 +426,7 @@ const handleSingup = (e) => {
   }
 
   if (validateForm1()) { // 유효성 검사 후, 오류가 없으면 회원가입 진행
-    fetch("http://192.168.0.102:8080/auth/register/buser", {
+    fetch(`${BASE_URL}/auth/register/buser`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -469,7 +471,7 @@ const handleSingup = (e) => {
       return;
     }
 
-    const url = `http://192.168.0.102:8080/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
+    const url = `${BASE_URL}/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
 
     fetch(url, {
       method: "GET",
@@ -509,7 +511,7 @@ const handleSingup = (e) => {
       return;
     }
 
-    const url = `http://192.168.0.102:8080/api/users/check-duplicate2?userid=${encodeURIComponent(formData1.userid)}`;
+    const url = `${BASE_URL}/api/users/check-duplicate2?userid=${encodeURIComponent(formData1.userid)}`;
 
     fetch(url, {
       method: "GET",

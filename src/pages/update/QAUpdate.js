@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const QAUpdate = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const { id } = useParams(); // URL에서 ID 가져오기
   const navigate = useNavigate();
   const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
@@ -25,7 +27,7 @@ const QAUpdate = () => {
   useEffect(() => {
     const fetchQAData = async () => {
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/question/questionDetail/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/question/questionDetail/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -74,7 +76,7 @@ const QAUpdate = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/question/update/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/question/update/${id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -101,7 +103,7 @@ const QAUpdate = () => {
     if (!window.confirm("정말로 이 Q&A를 삭제하시겠습니까?")) return;
 
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/question/delete/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/question/delete/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

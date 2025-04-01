@@ -6,6 +6,8 @@ import { faUser } from "@fortawesome/free-solid-svg-icons"; // 작성자 아이�
 import "./detail.css";
 
 function BankDetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate(); // 🔹 페이지 이동을 위한 useNavigate 사용
   const g_contents = "금융"; // 📌 실제 데이터와 연결 필요
 
@@ -54,7 +56,7 @@ const [bankDetails, setBankDetails] = useState({
         targetType: "GOV",
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -84,7 +86,7 @@ const [bankDetails, setBankDetails] = useState({
    // 상품 데이터 API 호출 (예시로 제품 정보 호출)
   const fetchBankDetails = async () => {
   try {
-    const response = await fetch(`http://192.168.0.102:8080/api/gov/govDetail/${id}`); // 예시 API URL
+    const response = await fetch(`${BASE_URL}/api/gov/govDetail/${id}`); // 예시 API URL
     if (!response.ok) {
       throw new Error("금융 데이터 조회에 실패했습니다.");
     }
@@ -140,7 +142,7 @@ const [bankDetails, setBankDetails] = useState({
 
         console.log(formDataToSend)
     
-        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

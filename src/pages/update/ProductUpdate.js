@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ProductUpdate = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ const ProductUpdate = () => {
     // 상품 정보 가져오기
     const fetchProductDetails = async () => {
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`);
+        const response = await fetch(`${BASE_URL}/api/products/productDetail/${id}`);
         if (!response.ok) throw new Error("상품 조회 실패");
 
         const data = await response.json();
@@ -68,7 +70,7 @@ const ProductUpdate = () => {
     if (validateForm()) {
       const token = localStorage.getItem("jwt");
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/products/productUpdate/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/products/productUpdate/${id}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,7 +100,7 @@ const ProductUpdate = () => {
       const token = localStorage.getItem("jwt");
 
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/products/productDelete/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/products/productDelete/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

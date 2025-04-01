@@ -5,6 +5,8 @@ import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons"; // faUse
 import "./detail.css";
 
 function NoticeDetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
   const [n_comments, setComments] = useState([]);  // 댓글 목록
   const [answer, setComment] = useState("");  // 댓글 입력 상태
@@ -33,7 +35,7 @@ function NoticeDetail() {
     // 상품 데이터 API 호출 (예시로 제품 정보 호출)
     const fetchNoticeDetails = async () => {
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/notice/noticeDetail/${id}`); // 예시 API URL
+        const response = await fetch(`${BASE_URL}/api/notice/noticeDetail/${id}`); // 예시 API URL
         if (!response.ok) {
           throw new Error("공지 데이터 조회에 실패했습니다.");
         }

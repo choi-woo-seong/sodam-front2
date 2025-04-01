@@ -5,6 +5,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import PersonPasswordPopup from "./PersonPasswordPopup"; // 새로 만든 모달 방식의 비밀번호 변경창 import
 
 function PersonMyPage() {
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
@@ -30,7 +32,7 @@ function PersonMyPage() {
             }
 
             const response = await fetch(
-                "http://192.168.0.102:8080/api/users/normal/info", 
+                `${BASE_URL}/api/users/normal/info`, 
                 {
                 method: "GET",
                 headers: {
@@ -106,7 +108,7 @@ function PersonMyPage() {
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(
-                `http://192.168.0.102:8080/api/users/normal/update`,
+                `${BASE_URL}/api/users/normal/update`,
                 {
                     method: "PUT",
                     headers: {
@@ -134,7 +136,7 @@ function PersonMyPage() {
             const token = localStorage.getItem("jwt");
             try {
                 const response = await fetch(
-                    `http://192.168.0.102:8080/api/users/normal/delete`,
+                    `${BASE_URL}/api/users/normal/delete`,
                     {
                         method: "DELETE",
                         headers: {

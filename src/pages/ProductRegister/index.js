@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
   
   // 상품 등록 폼 데이터 상태
@@ -101,7 +103,7 @@ const ProductRegister = () => {
         p_link: formData.p_link,
       };
   
-      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+      const response = await fetch(`${BASE_URL}/api/products/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

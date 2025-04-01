@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
 const BusinessRegister = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
 
   // 비즈니스 등록 폼 데이터 상태
@@ -92,7 +94,7 @@ const BusinessRegister = () => {
 
     console.log(formDataToSend);
 
-    fetch("http://192.168.0.102:8080/api/biz/create", {
+    fetch(`${BASE_URL}/api/biz/create`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,

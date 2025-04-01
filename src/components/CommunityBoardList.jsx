@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const CommunityBoardList = () => {
-const [data, setData] = useState([]);
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
 
@@ -17,7 +19,7 @@ const [data, setData] = useState([]);
           return;
         }
 
-        const response = await fetch("http://192.168.0.102:8080/api/community/searchAll", {
+        const response = await fetch(`${BASE_URL}/api/community/searchAll`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

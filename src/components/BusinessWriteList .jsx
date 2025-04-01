@@ -4,6 +4,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import "../styles/WriteBoardList.css";
 
 const BusinessWriteList = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
   
   // 페이지 상태를 객체로 관리
@@ -64,7 +66,7 @@ const BusinessWriteList = () => {
           return;
         }
 
-        const response = await fetch("http://192.168.0.102:8080/mypage/posts", {
+        const response = await fetch(`${BASE_URL}/mypage/posts`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

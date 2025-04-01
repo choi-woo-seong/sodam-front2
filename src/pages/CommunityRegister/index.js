@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CommunityRegister = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
 
   // 자유게시판 등록 폼 데이터 상태
@@ -63,7 +65,7 @@ const CommunityRegister = () => {
         c_content: formData.c_content,
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/community/create", {
+      const response = await fetch(`${BASE_URL}/api/community/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
