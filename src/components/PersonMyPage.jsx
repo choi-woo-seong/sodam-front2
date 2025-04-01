@@ -64,52 +64,71 @@ function PersonMyPage() {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.email) 
+    
+        if (!formData.name.trim()) newErrors.name = "이름을 입력하세요.";
+    
+        // 이메일 유효성 검사 추가 (정규 표현식 사용)
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!formData.email.trim()) {
             newErrors.email = "이메일을 입력하세요.";
-        if (!formData.phone1) 
-            newErrors.phone1 = "연락처1을 입력하세요.";
-        if (!formData.phone2) 
-            newErrors.phone2 = "연락처2를 입력하세요.";
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = "올바른 이메일 형식이 아닙니다.";
+        }
+    
+        if (!formData.address.trim()) newErrors.address = "주소를 입력하세요.";
+        if (!formData.phone1.trim()) newErrors.phone1 = "연락처1을 입력하세요.";
+        if (!formData.phone2.trim()) newErrors.phone2 = "연락처2를 입력하세요.";
+    
         setErrors(newErrors);
-
-        return Object
-            .keys(newErrors)
-            .length === 0;
+    
+        // 🚀 빈 칸이 있는 경우 해당 입력 필드로 포커스 이동
+        if (Object.keys(newErrors).length > 0) {
+            const firstErrorKey = Object.keys(newErrors)[0]; // 첫 번째 오류 필드 찾기
+            const firstErrorField = document.querySelector(`[name="${firstErrorKey}"]`);
+            if (firstErrorField) {
+                firstErrorField.focus(); // 🚀 해당 입력 필드에 포커스 주기
+            }
+    
+            alert(Object.values(newErrors).join("\n")); // 오류 메시지 표시
+            return false;
+        }
+    
+        return true;
     };
+    
+    
+    
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            const token = localStorage.getItem("jwt");
-            try {
-                const response = await fetch(
-                    `http://192.168.0.102:8080/api/users/normal/update`,
-                    {
-                        method: "PUT",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        },
-                        credentials: "include",
-                        body: JSON.stringify(formData),
-                        mode: "cors"
-                    }
-                );
-
-                if (!response.ok) 
-                    throw new Error("수정 실패");
-                
-                // 알림 메시지 표시
-                alert("수정이 완료되었습니다.");
-                navigate(""); // 수정 후 상세 페이지로 이동
-            } catch (error) {
-                console.error("수정 중 오류 발생:", error);
-                alert("수정 중 오류가 발생했습니다.");
-            }
-        } else {
-            alert("빈칸을 확인해주세요.");
+        if (!validateForm()) return; // validateForm()에서 오류 메시지를 출력하므로 추가 alert 불필요
+    
+        const token = localStorage.getItem("jwt");
+        try {
+            const response = await fetch(
+                `http://192.168.0.102:8080/api/users/normal/update`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(formData),
+                    mode: "cors"
+                }
+            );
+    
+            if (!response.ok) throw new Error("수정 실패");
+    
+            alert("수정이 완료되었습니다.");
+            navigate(""); // 수정 후 상세 페이지로 이동
+        } catch (error) {
+            console.error("수정 중 오류 발생:", error);
+            alert("수정 중 오류가 발생했습니다.");
         }
     };
+    
     const setDelete = async (e) => {
         if (validateForm()) {
             const token = localStorage.getItem("jwt");
@@ -189,6 +208,7 @@ function PersonMyPage() {
                         name="name" 
                         value={formData.name} 
                         onChange={handleChange} 
+                        readOnly 
                     />
                 </div>
 
@@ -213,23 +233,49 @@ function PersonMyPage() {
                 </div>
 
                 <div className="input-group">
-                    <label>연락처1 수정</label>
-                    <input 
-                        type="text" 
-                        name="phone1" 
-                        value={formData.phone1} 
-                        onChange={handleChange} 
-                    />
-                </div>
-                <div className="input-group">
-                    <label>연락처2 수정</label>
-                    <input 
-                        type="text" 
-                        name="phone2" 
-                        value={formData.phone2} 
-                        onChange={handleChange} 
-                    />
-                </div>
+                <label>전화번호 수정</label>
+                <input
+                    type="text"
+                    name="phone1"
+                    value={formData.phone1}
+                    onChange={(e) => {
+                        // 숫자만 입력할 수 있도록 필터링
+                        const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자만 남기기
+                        if (value.length <= 11) {  // 11자 이상 입력되지 않도록 제한
+                            setFormData({
+                                ...formData,
+                                phone1: value
+                            });
+                        }
+                    }}
+                    inputMode="numeric" // 숫자 전용 키패드 표시
+                    maxLength="11" // 최대 길이 11자
+                    minLength="11" // 최소 길이 11자
+                    required
+                />
+            </div>
+            <div className="input-group">
+                <label>휴대전화 수정</label>
+                <input
+                    type="text"
+                    name="phone2"
+                    value={formData.phone2}
+                    onChange={(e) => {
+                        // 숫자만 입력할 수 있도록 필터링
+                        const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자만 남기기
+                        if (value.length <= 11) {  // 11자 이상 입력되지 않도록 제한
+                            setFormData({
+                                ...formData,
+                                phone2: value
+                            });
+                        }
+                    }}
+                    inputMode="numeric" // 숫자 전용 키패드 표시
+                    maxLength="11" // 최대 길이 11자
+                    minLength="11" // 최소 길이 11자
+                    required
+                />
+            </div>
 
 
                 <div className="btn1">
