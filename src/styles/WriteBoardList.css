@@ -96,8 +96,8 @@
 }
 
 .write-pagination span.active {
-  background-color: #003f66;
-  color: white;
+ 
+  color: #003f66;
   border-radius: 4px;
 }
 
