@@ -109,7 +109,7 @@ function CommunityDetail() {
 
       if (!response.ok) throw new Error("댓글 등록 실패");
 
-      setMessage("댓글이 등록되었습니다."); // 성공 메시지
+      // setMessage("댓글이 등록되었습니다."); // 성공 메시지
       setComment(""); // 댓글 입력 초기화
       fetchData(); // 댓글 목록 갱신
 
