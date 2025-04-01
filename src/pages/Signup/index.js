@@ -19,9 +19,16 @@ const Signup = () => {
 
   // 에러 메시지 상태
   const [errors, setErrors] = useState({});
+  // 사업자 회원의 에러 상태 정의
+  const [errors1, setErrors1] = useState({});
   const [selectedTab, setSelectedTab] = useState("business");
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   const [cfCheckDuplicate, setcfCheckDuplicate] = useState(false);
+
+   // 이메일 인증 관련 상태
+   const [isEmailVerificationStarted, setIsEmailVerificationStarted] = useState(false);
+   const [verificationCode, setVerificationCode] = useState(""); // 인증번호 상태
+   const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(false); // 인증번호 유효 여부
 
   // 일반입력 필드 포커스 관리
   const refs = {
@@ -41,10 +48,10 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
     name: "",
-    ownerloc: "",
-    email: "",
     ownername: "", // 사업자명
     ownernum: "", // 사업자번호
+    ownerloc: "",
+    email: "",
     phone1: "",
     phone2: "",
   });
@@ -55,13 +62,13 @@ const Signup = () => {
     password: useRef(null),
     confirmPassword: useRef(null),
     name: useRef(null),
-    ownerloc: useRef(null),
-    email: useRef(null),
     ownername: useRef(null),
     ownernum: useRef(null),
+    ownerloc: useRef(null),
+    email: useRef(null),
     phone1: useRef(null),
     phone2: useRef(null),
-  };
+  };  
 
   // 일반입력값 변경 핸들러
   const handleChange = (e) => {
@@ -73,25 +80,254 @@ const Signup = () => {
     setFormData1({ ...formData1, [e.target.name]: e.target.value });
   };
 
-  // 폼 유효성 검사
-  const validateForm = () => {
-    const newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      if (!formData[key]) newErrors[key] = "입력하세요.";
-    });
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      refs[Object.keys(newErrors)[0]].current.focus();
-    }
-
-    return Object.keys(newErrors).length === 0;
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   };
+
+  // 전화번호 유효성 검사 함수
+const validatePhoneNumber = (phoneNumber) => {
+  const phoneRegex = /^[0-9]{11}$/; // 전화번호가 숫자만 11자리로 구성되어 있는지 확인
+  return phoneRegex.test(phoneNumber);
+};
+
+
+  //  일반회원 이메일 인증 시작 함수
+  const handleEmailCheck = () => {
+    setIsEmailVerificationStarted(true); // 이메일 인증 시작 상태로 변경
+    alert("이메일 인증 코드가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.
+  };
+
+  // 인증번호 입력 핸들러
+  const handleVerificationCodeChange = (e) => {
+    setVerificationCode(e.target.value);
+  };
+
+  // 인증번호 확인 함수
+  const handleVerificationCodeConfirm = () => {
+    // 여기서는 예시로 인증번호가 "123456"일 때만 유효한 것으로 처리합니다.
+    if (verificationCode === "123456") {
+      setIsVerificationCodeValid(true);
+      alert("인증 성공!");
+    } else {
+      setIsVerificationCodeValid(false);
+      alert("인증번호가 틀렸습니다.");
+    }
+  };
+
+    //  사업자 이메일 인증 시작 함수
+    const handleEmailCheck1 = () => {
+      setIsEmailVerificationStarted(true); // 이메일 인증 시작 상태로 변경
+      alert("이메일 인증 코드가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.
+    };
+  
+    // 인증번호 입력 핸들러
+    const handleVerificationCodeChange1 = (e) => {
+      setVerificationCode(e.target.value);
+    };
+  
+    // 인증번호 확인 함수
+    const handleVerificationCodeConfirm1 = () => {
+      // 여기서는 예시로 인증번호가 "123456"일 때만 유효한 것으로 처리합니다.
+      if (verificationCode === "123456") {
+        setIsVerificationCodeValid(true);
+        alert("인증 성공!");
+      } else {
+        setIsVerificationCodeValid(false);
+        alert("인증번호가 틀렸습니다.");
+      }
+    };
+  
+
+// 폼 유효성 검사 (일반 회원)
+const validateForm = () => {
+  const newErrors = {};
+  let hasError = false;
+
+  // 빈칸 체크
+  Object.keys(formData).forEach((key) => {
+    if (!formData[key]) {
+      newErrors[key] = "빈칸을 입력해주세요.";
+      hasError = true;
+    }
+  });
+
+  // 이메일 유효성 검사
+  if (formData.email && !validateEmail(formData.email)) {
+    newErrors.email = "유효한 이메일을 입력해주세요.";
+    hasError = true;
+  }
+
+  // 비밀번호 일치 여부
+  if (formData.password !== formData.confirmPassword) {
+    newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
+    hasError = true;
+  }
+
+  // 전화번호 유효성 검사 (phone1)
+  if (formData.phone1 && !validatePhoneNumber(formData.phone1)) {
+    newErrors.phone1 = "전화번호는 11자리 숫자만 입력 가능합니다.";
+    hasError = true;
+  }
+
+  // 전화번호 유효성 검사 (phone2)
+  if (formData.phone2 && !validatePhoneNumber(formData.phone2)) {
+    newErrors.phone2 = "휴대전화는 11자리 숫자만 입력 가능합니다.";
+    hasError = true;
+  }
+
+  setErrors(newErrors);
+
+  if (hasError) {
+    const firstErrorKey = Object.keys(newErrors)[0];
+    if (refs[firstErrorKey] && refs[firstErrorKey].current) {
+      alert(newErrors[firstErrorKey]);  // 오류 메시지 알림
+      refs[firstErrorKey].current.focus();  // 첫 번째 오류 필드에 포커스
+    }
+  }
+
+  return !hasError;
+};
+
+
+
+// 사업자 회원가입 폼 유효성 검사
+const validateForm1 = () => {
+  const newErrors1 = {}; // 사업자 폼의 오류들
+  let hasError = false;
+
+  // 빈칸 체크
+  Object.keys(formData1).forEach((key) => {
+    if (!formData1[key]) {
+      newErrors1[key] = "빈칸을 입력해주세요.";
+      hasError = true;
+    }
+  });
+
+  // 이메일 유효성 검사
+  if (formData1.email && !validateEmail(formData1.email)) {
+    newErrors1.email = "유효한 이메일을 입력해주세요.";
+    hasError = true;
+  }
+
+  // 비밀번호 일치 여부
+  if (formData1.password !== formData1.confirmPassword) {
+    newErrors1.confirmPassword = "비밀번호가 일치하지 않습니다.";
+    hasError = true;
+  }
+
+  // 전화번호 유효성 검사 (phone1)
+  if (formData1.phone1 && !validatePhoneNumber(formData1.phone1)) {
+    newErrors1.phone1 = "전화번호는 11자리 숫자만 입력 가능합니다.";
+    hasError = true;
+  }
+
+  // 전화번호 유효성 검사 (phone2)
+  if (formData1.phone2 && !validatePhoneNumber(formData1.phone2)) {
+    newErrors1.phone2 = "휴대전화는 11자리 숫자만 입력 가능합니다.";
+    hasError = true;
+  }
+
+  setErrors1(newErrors1); // 오류 상태를 업데이트
+
+  if (hasError) {
+    // 첫 번째 오류 키를 찾고 해당 필드로 포커스 이동
+    const firstErrorKey = Object.keys(newErrors1)[0];
+    const firstErrorField = refs1[firstErrorKey]; // 오류가 발생한 필드
+    if (firstErrorField && firstErrorField.current) {
+      firstErrorField.current.focus();  // 첫 번째 오류 필드로 포커스 이동
+    }
+  }
+
+  return !hasError;
+};
+
+
+
+
+
+const handleNomalSingup = (e) => {
+  e.preventDefault();
+
+  if (cfCheckDuplicate === false) {
+    alert("아이디 중복확인 해주세요");
+    return;
+  }
+
+  if (validateForm()) {  // 유효성 검사 추가
+    const payload = {
+      n_userid: formData.n_userid,
+      password: formData.password,
+      name: formData.name,
+      address: formData.address,
+      email: formData.email,
+      phone1: formData.phone1,
+      phone2: formData.phone2,
+    };
+
+    fetch("http://192.168.0.102:8080/auth/register/nuser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+      mode: "cors",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("회원가입 실패");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("회원가입 성공!");
+        navigate("/personLogin");
+      })
+      .catch((error) => {
+        console.error("회원가입 에러:", error);
+        alert("회원가입 중 오류 발생. 관리자에게 문의하세요.");
+      });
+  }
+};
+
+
+
+const handleSingup = (e) => {
+  e.preventDefault();
+
+  if (cfCheckDuplicate === false) {
+    alert("아이디 중복확인 해주세요");
+    return;
+  }
+
+  if (validateForm1()) { // 유효성 검사 후, 오류가 없으면 회원가입 진행
+    fetch("http://192.168.0.102:8080/auth/register/buser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(formData1),
+      mode: "cors",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          alert("회원가입 성공!");
+          navigate("/businessLogin");
+        } else {
+          console.error("회원가입 실패", data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("서버와 연결 중 오류 발생:", error);
+      });
+  } else {
+    alert("빈칸을 확인해주세요."); // 이 부분을 한 번만 출력하도록 합니다
+  }
+};
+
 
   // 일반 회원가입 처리
   const handleSubmit = (e) => {
@@ -183,82 +419,7 @@ const Signup = () => {
       });
   };
 
-  // 일반 회원가입 처리
-  const handleNomalSingup = (e) => {
-    e.preventDefault();
-    console.log("회원가입 데이터:", formData);
 
-    if (cfCheckDuplicate === false) {
-      alert("아이디 중복확인 해주세요");
-      return;
-    }
-
-    const payload = {
-      n_userid: formData.n_userid,
-      password: formData.password,
-      name: formData.name,
-      address: formData.address,
-      email: formData.email,
-      phone1: formData.phone1,
-      phone2: formData.phone2,
-    };
-
-    fetch("http://192.168.0.102:8080/auth/register/nuser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(payload), // 올바른 payload로 전송
-      mode: "cors",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("회원가입 실패");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        alert("회원가입 성공!");
-        navigate("/personLogin");
-      })
-      .catch((error) => {
-        console.error("회원가입 에러:", error);
-        alert("회원가입 중 오류 발생. 관리자에게 문의하세요.");
-      });
-  };
-
-  // 사업자 회원가입 처리
-  const handleSingup = (e) => {
-    e.preventDefault();
-    console.log("회원가입 데이터:", formData1);
-
-    if (cfCheckDuplicate === false) {
-      alert("아이디 중복확인 해주세요");
-    } else {
-      fetch("http://192.168.0.102:8080/auth/register/buser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData1),
-        mode: "cors", // CORS 요청을 명확히 설정
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data) {
-            alert("회원가입 성공!");
-            navigate("/businessLogin");
-          } else {
-            console.error("회원가입 실패", data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("서버와 연결 중 오류 발생:", error);
-        });
-    }
-  };
 
   useEffect(() => {
     document.body.classList.add("signup-page-body");
@@ -305,13 +466,14 @@ const Signup = () => {
             <input type="password" name="confirmPassword" ref={refs.confirmPassword} value={formData.confirmPassword} onChange={handleChange} />
           </div>
 
-          {formData.nPassword && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-            <div className="error-msg">비밀번호가 일치하지 않습니다.</div>
+          {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+          <div className="error-msg">비밀번호가 일치하지 않습니다.</div>
           )}
 
-          {formData.nPassword && formData.confirmPassword && formData.password === formData.confirmPassword && (
-            <div className="success-msg">비밀번호가 일치합니다.</div>
+         {formData.password && formData.confirmPassword && formData.password === formData.confirmPassword && (
+          <div className="success-msg">비밀번호가 일치합니다.</div>
           )}
+
 
           <div className="input-container">
             <label>이름</label>
@@ -324,9 +486,36 @@ const Signup = () => {
           </div>
 
           <div className="input-container">
-            <label>이메일</label>
-            <input type="email" name="email" ref={refs.email} value={formData.email} onChange={handleChange} />
+          <label>이메일</label>
+          <input
+            type="email"
+            name="email"
+            ref={refs.email}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+          <button type="button" onClick={handleEmailCheck}>
+            이메일 인증
+          </button>
+        </div>
+
+        {/* 이메일 인증 번호 입력 필드가 나타나도록 */}
+        {isEmailVerificationStarted && (
+          <div className="input-container">
+            <label>인증번호</label>
+            <input
+              type="text"
+              value={verificationCode}
+              onChange={handleVerificationCodeChange}
+            />
+            <button type="button" onClick={handleVerificationCodeConfirm}>
+              확인
+            </button>
           </div>
+        )}
+
+        {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
+        {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
 
           <div className="input-container">
             <label>전화번호</label>
@@ -382,7 +571,7 @@ const Signup = () => {
 
           <div className="input-container">
             <label>이름</label>
-            <input type="text" name="name" ref={refs.name} value={formData1.name} onChange={handleChange1} />
+            <input type="text" name="name" ref={refs1.name} value={formData1.name} onChange={handleChange1} />
           </div>
 
           <div className="input-container">
@@ -405,9 +594,36 @@ const Signup = () => {
           </div>
 
           <div className="input-container">
-            <label>이메일</label>
-            <input type="email" name="email" ref={refs1.email} value={formData1.email} onChange={handleChange1} />
+          <label>이메일</label>
+          <input
+            type="email"
+            name="email"
+            ref={refs.email}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+          <button type="button" onClick={handleEmailCheck1}>
+            이메일 인증
+          </button>
+        </div>
+
+        {/* 이메일 인증 번호 입력 필드가 나타나도록 */}
+        {isEmailVerificationStarted && (
+          <div className="input-container">
+            <label>인증번호</label>
+            <input
+              type="text"
+              value={verificationCode}
+              onChange={handleVerificationCodeChange1}
+            />
+            <button type="button" onClick={handleVerificationCodeConfirm1}>
+              확인
+            </button>
           </div>
+        )}
+
+        {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
+        {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
 
           <div className="input-container">
             <label>전화번호</label>
