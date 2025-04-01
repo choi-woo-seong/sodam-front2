@@ -22,6 +22,7 @@ function Nav() {
     localStorage.removeItem('userName'); // 🔥 `userName` 키 삭제
     localStorage.removeItem("recentlyViewed"); // 🔹 최근 본 항목 삭제
     localStorage.removeItem('jwt');
+    localStorage.removeItem('userType');
     setUserName(null); // 상태 초기화
 
     alert("로그아웃되었습니다.");

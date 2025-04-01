@@ -21,6 +21,9 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   // 사업자 회원의 에러 상태 정의
   const [errors1, setErrors1] = useState({});
+    // 오류 메시지 상태
+  const [message, setMessage] = useState("");
+  
   const [selectedTab, setSelectedTab] = useState("business");
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   const [cfCheckDuplicate, setcfCheckDuplicate] = useState(false);
@@ -29,6 +32,7 @@ const Signup = () => {
    const [isEmailVerificationStarted, setIsEmailVerificationStarted] = useState(false);
    const [verificationCode, setVerificationCode] = useState(""); // 인증번호 상태
    const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(false); // 인증번호 유효 여부
+   const [isVerificationAttempted, setIsVerificationAttempted] = useState(false);
 
   // 일반입력 필드 포커스 관리
   const refs = {
@@ -85,6 +89,12 @@ const Signup = () => {
     return emailRegex.test(email);
   };
 
+  // ✅ 유선전화 (phone1): 10자리 또는 11자리 숫자
+const validatePhone1 = (phoneNumber) => {
+  const phoneRegex = /^[0-9]{9,11}$/; // 9~11자리 숫자
+  return phoneRegex.test(phoneNumber);
+};
+
   // 전화번호 유효성 검사 함수
 const validatePhoneNumber = (phoneNumber) => {
   const phoneRegex = /^[0-9]{11}$/; // 전화번호가 숫자만 11자리로 구성되어 있는지 확인
@@ -94,6 +104,10 @@ const validatePhoneNumber = (phoneNumber) => {
 
   //  일반회원 이메일 인증 시작 함수
   const handleEmailCheck = () => {
+    if(formData.email.length === 0 ){
+      alert("이메일을 입력하지 않았습니다.");
+      return;      
+    }
     const payload = {
       email: formData.email,
     };
@@ -121,6 +135,11 @@ const validatePhoneNumber = (phoneNumber) => {
 
     //  일반회원 이메일 인증 시작 함수
   const handleVerificationCodeConfirm = () => {
+    setIsVerificationAttempted(true); // ✅ 인증 시도했다는 플래그 설정
+    if(verificationCode.length === 0 ){
+      alert("인증번호를 입력하지 않았습니다.");
+      return;      
+    }
     const payload = {
       email: formData.email,
       code: verificationCode,
@@ -142,10 +161,8 @@ const validatePhoneNumber = (phoneNumber) => {
     .then(result => {
       if(result.success){
         setIsVerificationCodeValid(result.success);
-        alert(result.message);
       }else{
         setIsVerificationCodeValid(result.success);
-        alert(result.message);
       }
     })
     .catch((error) => {
@@ -162,6 +179,10 @@ const validatePhoneNumber = (phoneNumber) => {
 
    //  사업자회원 이메일 인증 시작 함수
    const handleEmailCheck1 = () => {
+    if(formData1.b_email.length === 0 ){
+      alert("이메일을 입력하지 않았습니다.");
+      return;      
+    }
     const payload = {
       email: formData1.b_email,
     };
@@ -189,6 +210,11 @@ const validatePhoneNumber = (phoneNumber) => {
 
     //  일반회원 이메일 인증 시작 함수
   const handleVerificationCodeConfirm1 = () => {
+    setIsVerificationAttempted(true); // ✅ 인증 시도했다는 플래그 설정
+    if(verificationCode.length === 0 ){
+      alert("인증번호를 입력하지 않았습니다.");
+      return;      
+    }
     const payload = {
       email: formData1.b_email,
       code: verificationCode,
@@ -210,10 +236,8 @@ const validatePhoneNumber = (phoneNumber) => {
     .then(result => {
       if(result.success){
         setIsVerificationCodeValid(result.success);
-        alert(result.message);
       }else{
         setIsVerificationCodeValid(result.success);
-        alert(result.message);
       }
     })
     .catch((error) => {
@@ -256,8 +280,8 @@ const validateForm = () => {
   }
 
   // 전화번호 유효성 검사 (phone1)
-  if (formData.phone1 && !validatePhoneNumber(formData.phone1)) {
-    newErrors.phone1 = "전화번호는 11자리 숫자만 입력 가능합니다.";
+  if (formData.phone1 && !validatePhone1(formData.phone1)) {
+    newErrors.phone1 = "전화번호는 9 ~ 11자리 숫자만 입력 가능합니다.";
     hasError = true;
   }
 
@@ -282,13 +306,14 @@ const validateForm = () => {
 
 
 
-// 사업자 회원가입 폼 유효성 검사
+// 폼 유효성 검사 - 사업자 회원
 const validateForm1 = () => {
-  const newErrors1 = {}; // 사업자 폼의 오류들
+  const newErrors1 = {};
   let hasError = false;
 
-  // 빈칸 체크
+  // 이메일, 전화번호 제외하고 빈칸 체크
   Object.keys(formData1).forEach((key) => {
+    if (["b_email", "phone1", "phone2"].includes(key)) return;
     if (!formData1[key]) {
       newErrors1[key] = "빈칸을 입력해주세요.";
       hasError = true;
@@ -296,8 +321,19 @@ const validateForm1 = () => {
   });
 
   // 이메일 유효성 검사
-  if (formData1.b_email && !validateEmail(formData1.b_email)) {
+  if (!formData1.b_email || !validateEmail(formData1.b_email)) {
     newErrors1.b_email = "유효한 이메일을 입력해주세요.";
+    hasError = true;
+  }
+
+  // 전화번호 유효성 검사
+  if (!formData1.phone1 || !validatePhone1(formData1.phone1)) {
+    newErrors1.phone1 = "전화번호는 9 ~ 11자리 숫자만 입력 가능합니다.";
+    hasError = true;
+  }
+
+  if (!formData1.phone2 || !validatePhoneNumber(formData1.phone2)) {
+    newErrors1.phone2 = "휴대전화는 11자리 숫자만 입력 가능합니다.";
     hasError = true;
   }
 
@@ -307,35 +343,20 @@ const validateForm1 = () => {
     hasError = true;
   }
 
-  // 전화번호 유효성 검사 (phone1)
-  if (formData1.phone1 && !validatePhoneNumber(formData1.phone1)) {
-    newErrors1.phone1 = "전화번호는 11자리 숫자만 입력 가능합니다.";
-    hasError = true;
-  }
-
-  // 전화번호 유효성 검사 (phone2)
-  if (formData1.phone2 && !validatePhoneNumber(formData1.phone2)) {
-    newErrors1.phone2 = "휴대전화는 11자리 숫자만 입력 가능합니다.";
-    hasError = true;
-  }
-
-  setErrors1(newErrors1); // 오류 상태를 업데이트
+  
+  setErrors1(newErrors1);
 
   if (hasError) {
-    // 첫 번째 오류 키를 찾고 해당 필드로 포커스 이동
     const firstErrorKey = Object.keys(newErrors1)[0];
-    const firstErrorField = refs1[firstErrorKey]; // 오류가 발생한 필드
+    const firstErrorField = refs1[firstErrorKey];
     if (firstErrorField && firstErrorField.current) {
-      firstErrorField.current.focus();  // 첫 번째 오류 필드로 포커스 이동
+      alert(newErrors1[firstErrorKey]);
+      firstErrorField.current.focus();
     }
   }
 
   return !hasError;
 };
-
-
-
-
 
 const handleNomalSingup = (e) => {
   e.preventDefault();
@@ -616,7 +637,9 @@ const handleSingup = (e) => {
         )}
 
         {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
-        {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
+        {isVerificationAttempted && !isVerificationCodeValid && (
+          <div className="error-msg">인증번호가 틀렸습니다.</div>
+        )}
 
         <div className="input-container">
   <label>전화번호</label>
@@ -753,9 +776,10 @@ const handleSingup = (e) => {
             </button>
           </div>
         )}
-
         {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
-        {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
+        {isVerificationAttempted && !isVerificationCodeValid && (
+          <div className="error-msg">인증번호가 틀렸습니다.</div>
+        )}
 
         <div className="input-container">
   <label>전화번호</label>

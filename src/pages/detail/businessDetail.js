@@ -7,7 +7,7 @@ import "./detail.css";
 function BusinessDetail() {
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
   const { id } = useParams(); // URL에서 productId 파라미터 가져오기
-
+  // 📌 찜 상태 (DB 연결 전에는 localStorage 사용)
   const [businessDetails, setBusinessDetails] = useState({
     b_title: "비즈니스 제목",
     b_price: "100,000 원",
@@ -20,6 +20,7 @@ function BusinessDetail() {
 
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({});
 
   // 비즈니스 데이터 가져오기
   useEffect(() => {
@@ -48,7 +49,89 @@ function BusinessDetail() {
     };
 
     fetchBusinessDetails();
+    fetchFavoriteDetails();
   }, [id]);
+
+  const fetchFavoriteDetails = async (e) => {
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      // 📌 찜 추가 (배열에 추가)
+      const formDataToSend = {
+        targetId: id,
+        targetType: "BIZ",
+        targetPgm:"businessDetail",
+      };
+
+      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json", // ✅ JSON 데이터 전송
+        },
+        body: JSON.stringify(formDataToSend)
+      }); // 예시 API URL
+      if (!response.ok) {
+        throw new Error("찜 데이터 체크에 실패했습니다.");
+      }
+
+      const data = await response.json();
+
+      if (data.favorited) {
+        setIsBookmarked(data.favorited);
+      } else {
+        setIsBookmarked(data.favorited);
+      }
+    } catch (error) {
+      console.error("찜 데이터 가져오기 실패:", error);
+    }
+  };
+
+   // 📌 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
+   const handleBookmarkClick = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+
+    if (!token) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+      // 📌 찜 추가 (배열에 추가)
+      try {
+        const formDataToSend = {
+          targetId: id,
+          targetType: "BIZ",
+        };
+
+        console.log(formDataToSend)
+    
+        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json", // ✅ JSON 데이터 전송
+          },
+          body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
+        });
+    
+        if (!response.ok) {
+          throw new Error("등록에 실패했습니다.");
+        }
+    
+        setMessage("성공적으로 등록되었습니다.");
+     
+      } catch (error) {
+        setErrors(error.message);
+        console.error("찜 등록 오류:", error);
+      }
+      fetchFavoriteDetails();
+  };
 
   // 목록으로 돌아가기
   const handleGoToList = () => {
@@ -80,8 +163,8 @@ function BusinessDetail() {
         <div className="detail-header">
           <FontAwesomeIcon
             icon={faBookmark}
-            className={isBookmarked ? "active" : ""}
-            // onClick={handleBookmarkClick} // 찜 버튼 클릭 핸들러 필요
+            className={`bookmark-icon ${isBookmarked ? "active" : ""}`}
+            onClick={handleBookmarkClick} // 찜 버튼 클릭 핸들러 필요
           />
         </div>
 
@@ -121,15 +204,16 @@ function BusinessDetail() {
           </div>
           <div className="detail-row">
             <div className="detail-label">링크</div>
-            <input
-              type="text"
+            <a
+              href={businessDetails.b_link} // 링크 클릭 시 해당 URL로 이동
+              target="_blank" // 새 창에서 링크 열리도록 설정
+              rel="noopener noreferrer" // 보안 설정
               className="detail-text"
-              name="b_link"
-              id="b_link"
-              value={businessDetails.b_link}
-              disabled={true}
-            />
+            >
+              {businessDetails.b_link} {/* 링크 텍스트로 URL 표시 */}
+            </a>
           </div>
+
 
           <div className="detail-row">
             <div className="detail-label">지도</div>

@@ -233,16 +233,17 @@ function ProductDetail() {
             ></textarea>
           </div>
           <div className="detail-row">
-            <div className="detail-label">링크</div>
-            <input
-              type="text"
-              className="detail-text"
-              name="p_link"
-              id="p_link"
-              value={productDetails.p_link}
-              disabled={true}
-            />
-          </div>
+          <div className="detail-label">링크</div>
+          <a
+            href={productDetails.p_link} // 링크를 클릭했을 때 해당 페이지로 이동
+            target="_blank" // 새 창에서 열리도록 설정
+            rel="noopener noreferrer" // 보안 설정
+            className="detail-text"
+          >
+            {productDetails.p_link} {/* 링크 텍스트로 URL 표시 */}
+          </a>
+        </div>
+
           <div className="detail-row">
             <div className="detail-label">지도</div>
             <input
