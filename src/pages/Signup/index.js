@@ -517,23 +517,54 @@ const handleSingup = (e) => {
         {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
         {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
 
-          <div className="input-container">
-            <label>전화번호</label>
-            <input type="number" name="phone1" ref={refs.phone1} value={formData.phone1} onChange={handleChange} 
-            className="no-spinner"
-            onInput={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-            }}/>
-          </div>
+        <div className="input-container">
+  <label>전화번호</label>
+  <input 
+    type="text"  // 'number'에서 'text'로 변경하여 숫자 외의 입력을 방지
+    name="phone1" 
+    ref={refs.phone1} 
+    value={formData.phone1} 
+    onChange={(e) => {
+      const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자 외 문자는 제거
+      if (value.length <= 11) {  // 최대 11자리 입력 제한
+        setFormData({
+          ...formData,
+          phone1: value
+        });
+      }
+    }} 
+    className="no-spinner"
+    inputMode="numeric"  // 모바일에서 숫자 키패드 표시
+    maxLength="11"  // 최대 11자리 입력 가능
+    minLength="11"  // 최소 11자리 입력 (필요한 경우)
+    required
+  />
+</div>
 
-          <div className="input-container">
-            <label>휴대전화</label>
-            <input type="number" name="phone2" ref={refs.phone2} value={formData.phone2} onChange={handleChange} 
-            className="no-spinner"
-            onInput={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-            }}/>
-          </div>
+<div className="input-container">
+  <label>휴대전화</label>
+  <input 
+    type="text"  // 'number'에서 'text'로 변경
+    name="phone2" 
+    ref={refs.phone2} 
+    value={formData.phone2} 
+    onChange={(e) => {
+      const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자 외 문자는 제거
+      if (value.length <= 11) {  // 최대 11자리 입력 제한
+        setFormData({
+          ...formData,
+          phone2: value
+        });
+      }
+    }} 
+    className="no-spinner"
+    inputMode="numeric"  // 모바일에서 숫자 키패드 표시
+    maxLength="11"  // 최대 11자리 입력 가능
+    minLength="11"  // 최소 11자리 입력 (필요한 경우)
+    required
+  />
+</div>
+
 
           <div className="submit-button-container">
             <button type="submit" className="submit" onClick={handleNomalSingup}>회원가입</button>
@@ -625,23 +656,54 @@ const handleSingup = (e) => {
         {isVerificationCodeValid && <div className="success-msg">인증이 완료되었습니다.</div>}
         {!isVerificationCodeValid && verificationCode && <div className="error-msg">인증번호가 틀렸습니다.</div>}
 
-          <div className="input-container">
-            <label>전화번호</label>
-            <input type="number" name="phone1" ref={refs1.phone1} value={formData1.phone1} onChange={handleChange1} 
-            className="no-spinner"
-            onInput={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-            }}/>
-          </div>
+        <div className="input-container">
+  <label>전화번호</label>
+  <input 
+    type="text"  // 'number'에서 'text'로 변경하여 숫자 외의 입력을 방지
+    name="phone1" 
+    ref={refs1.phone1} 
+    value={formData1.phone1} 
+    onChange={(e) => {
+      const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자 외 문자는 제거
+      if (value.length <= 11) {  // 최대 11자리 입력 제한
+        setFormData1({
+          ...formData1,
+          phone1: value
+        });
+      }
+    }} 
+    className="no-spinner"
+    inputMode="numeric"  // 모바일에서 숫자 키패드 표시
+    maxLength="11"  // 최대 11자리 입력 가능
+    minLength="11"  // 최소 11자리 입력 (필요한 경우)
+    required
+  />
+</div>
 
-          <div className="input-container">
-            <label>휴대전화</label>
-            <input type="number" name="phone2" ref={refs1.phone2} value={formData1.phone2} onChange={handleChange1} 
-            className="no-spinner"
-            onInput={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-            }}/>
-          </div>
+<div className="input-container">
+  <label>휴대전화</label>
+  <input 
+    type="text"  // 'number'에서 'text'로 변경
+    name="phone2" 
+    ref={refs1.phone2} 
+    value={formData1.phone2} 
+    onChange={(e) => {
+      const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자 외 문자는 제거
+      if (value.length <= 11) {  // 최대 11자리 입력 제한
+        setFormData1({
+          ...formData1,
+          phone2: value
+        });
+      }
+    }} 
+    className="no-spinner"
+    inputMode="numeric"  // 모바일에서 숫자 키패드 표시
+    maxLength="11"  // 최대 11자리 입력 가능
+    minLength="11"  // 최소 11자리 입력 (필요한 경우)
+    required
+  />
+</div>
+
 
           <div className="submit-button-container">
             <button type="submit" className="submit" onClick={handleSingup}>회원가입</button>
