@@ -51,7 +51,7 @@ const Signup = () => {
     ownername: "", // 사업자명
     ownernum: "", // 사업자번호
     ownerloc: "",
-    email: "",
+    b_email: "",
     phone1: "",
     phone2: "",
   });
@@ -65,7 +65,7 @@ const Signup = () => {
     ownername: useRef(null),
     ownernum: useRef(null),
     ownerloc: useRef(null),
-    email: useRef(null),
+    b_email: useRef(null),
     phone1: useRef(null),
     phone2: useRef(null),
   };  
@@ -94,8 +94,65 @@ const validatePhoneNumber = (phoneNumber) => {
 
   //  일반회원 이메일 인증 시작 함수
   const handleEmailCheck = () => {
-    setIsEmailVerificationStarted(true); // 이메일 인증 시작 상태로 변경
-    alert("이메일 인증 코드가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.
+    const payload = {
+      email: formData.email,
+    };
+    console.log(payload);
+    fetch("http://192.168.0.102:8080/email/send-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("이메일 인증 중 오류 발생!");
+      }else{
+        setIsEmailVerificationStarted(true);
+        alert("이메일 인증번호가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.  
+      }
+    })
+    .catch((error) => {
+      console.error("이메일 인증 에러:", error);
+      alert("이메일 인증 중 오류 발생. 관리자에게 문의하세요.");
+    });
+  };
+
+    //  일반회원 이메일 인증 시작 함수
+  const handleVerificationCodeConfirm = () => {
+    const payload = {
+      email: formData.email,
+      code: verificationCode,
+    };
+    console.log(payload);
+    fetch("http://192.168.0.102:8080/email/verify-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("이메일 인증 중 오류 발생!");
+      }
+      return response.json();
+    })
+    .then(result => {
+      if(result.success){
+        setIsVerificationCodeValid(result.success);
+        alert(result.message);
+      }else{
+        setIsVerificationCodeValid(result.success);
+        alert(result.message);
+      }
+    })
+    .catch((error) => {
+      console.error("이메일 인증 에러:", error);
+      alert("이메일 인증 중 오류 발생. 관리자에게 문의하세요.");
+    });
+
   };
 
   // 인증번호 입력 핸들러
@@ -103,41 +160,75 @@ const validatePhoneNumber = (phoneNumber) => {
     setVerificationCode(e.target.value);
   };
 
-  // 인증번호 확인 함수
-  const handleVerificationCodeConfirm = () => {
-    // 여기서는 예시로 인증번호가 "123456"일 때만 유효한 것으로 처리합니다.
-    if (verificationCode === "123456") {
-      setIsVerificationCodeValid(true);
-      alert("인증 성공!");
-    } else {
-      setIsVerificationCodeValid(false);
-      alert("인증번호가 틀렸습니다.");
-    }
+   //  사업자회원 이메일 인증 시작 함수
+   const handleEmailCheck1 = () => {
+    const payload = {
+      email: formData1.b_email,
+    };
+    console.log(payload);
+    fetch("http://192.168.0.102:8080/email/send-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("이메일 인증 중 오류 발생!");
+      }else{
+        setIsEmailVerificationStarted(true);
+        alert("이메일 인증번호가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.  
+      }
+    })
+    .catch((error) => {
+      console.error("이메일 인증 에러:", error);
+      alert("이메일 인증 중 오류 발생. 관리자에게 문의하세요.");
+    });
   };
 
-    //  사업자 이메일 인증 시작 함수
-    const handleEmailCheck1 = () => {
-      setIsEmailVerificationStarted(true); // 이메일 인증 시작 상태로 변경
-      alert("이메일 인증 코드가 발송되었습니다."); // 실제 이메일 인증 코드 발송 부분은 서버와 연동해야 합니다.
+    //  일반회원 이메일 인증 시작 함수
+  const handleVerificationCodeConfirm1 = () => {
+    const payload = {
+      email: formData1.b_email,
+      code: verificationCode,
     };
-  
-    // 인증번호 입력 핸들러
-    const handleVerificationCodeChange1 = (e) => {
-      setVerificationCode(e.target.value);
-    };
-  
-    // 인증번호 확인 함수
-    const handleVerificationCodeConfirm1 = () => {
-      // 여기서는 예시로 인증번호가 "123456"일 때만 유효한 것으로 처리합니다.
-      if (verificationCode === "123456") {
-        setIsVerificationCodeValid(true);
-        alert("인증 성공!");
-      } else {
-        setIsVerificationCodeValid(false);
-        alert("인증번호가 틀렸습니다.");
+    console.log(payload);
+    fetch("http://192.168.0.102:8080/email/verify-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("이메일 인증 중 오류 발생!");
       }
-    };
-  
+      return response.json();
+    })
+    .then(result => {
+      if(result.success){
+        setIsVerificationCodeValid(result.success);
+        alert(result.message);
+      }else{
+        setIsVerificationCodeValid(result.success);
+        alert(result.message);
+      }
+    })
+    .catch((error) => {
+      console.error("이메일 인증 에러:", error);
+      alert("이메일 인증 중 오류 발생. 관리자에게 문의하세요.");
+    });
+
+  };
+
+  // 인증번호 입력 핸들러
+  const handleVerificationCodeChange1 = (e) => {
+    setVerificationCode(e.target.value);
+  };
+
+ 
 
 // 폼 유효성 검사 (일반 회원)
 const validateForm = () => {
@@ -205,8 +296,8 @@ const validateForm1 = () => {
   });
 
   // 이메일 유효성 검사
-  if (formData1.email && !validateEmail(formData1.email)) {
-    newErrors1.email = "유효한 이메일을 입력해주세요.";
+  if (formData1.b_email && !validateEmail(formData1.b_email)) {
+    newErrors1.b_email = "유효한 이메일을 입력해주세요.";
     hasError = true;
   }
 
@@ -254,6 +345,11 @@ const handleNomalSingup = (e) => {
     return;
   }
 
+  if (isVerificationCodeValid === false) {
+    alert("이메일 인증을 해주세요");
+    return;
+  }
+
   if (validateForm()) {  // 유효성 검사 추가
     const payload = {
       n_userid: formData.n_userid,
@@ -298,6 +394,11 @@ const handleSingup = (e) => {
 
   if (cfCheckDuplicate === false) {
     alert("아이디 중복확인 해주세요");
+    return;
+  }
+
+  if (isVerificationCodeValid === false) {
+    alert("이메일 인증을 해주세요");
     return;
   }
 
@@ -628,10 +729,10 @@ const handleSingup = (e) => {
           <label>이메일</label>
           <input
             type="email"
-            name="email"
-            ref={refs.email}
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            name="b_email"
+            ref={refs1.b_email}
+            value={formData1.b_email}
+            onChange={(e) => setFormData1({ ...formData1, b_email: e.target.value })}
           />
           <button type="button" onClick={handleEmailCheck1}>
             이메일 인증
