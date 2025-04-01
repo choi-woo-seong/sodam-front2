@@ -57,10 +57,10 @@ useEffect(() => {
   const currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
 
   // 총 페이지 수 계산
-  const totalPages = Math.ceil(data.length / postsPerPage);
+  const totalPages = Math.max(1, Math.ceil(data.length / postsPerPage));
 
   // 페이지 번호 변경 함수
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(Math.max(1,pageNumber));
 
   // 첫 번째, 마지막 페이지로 이동
   const goToFirstPage = () => setCurrentPage(1);
@@ -112,7 +112,7 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4">등록된 상품이 없습니다.</td>
+                        <td colSpan="4">등록된 데이터가 없습니다.</td>
                       </tr>
                     )}
         </tbody>
