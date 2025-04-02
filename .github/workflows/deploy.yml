@@ -18,6 +18,9 @@ jobs:
     - name: 프로젝트 의존성 설치
       run: npm install # 또는 yarn install
 
+    - name: ESLint 검사 (경고 무시)
+      run: npm run lint -- --quiet --max-warnings=5 || echo "ESLint 경고 발생 - 계속 진행"
+
     - name: React 빌드
       run: npm run build # 또는 yarn build
 
