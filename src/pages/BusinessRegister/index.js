@@ -1,9 +1,12 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Register.css"; 
+import "./Register.css";
 
 const BusinessRegister = () => {
-const navigate = useNavigate();
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const navigate = useNavigate();
+
   // 비즈니스 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     b_title: "",
@@ -12,10 +15,9 @@ const navigate = useNavigate();
     b_link: "",
   });
 
-    // 오류 메시지 상태
-    const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState("");
-  
+  // 오류 메시지 상태
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
 
   // 입력 필드의 ref 생성
   const refs = {
@@ -32,12 +34,6 @@ const navigate = useNavigate();
       .replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 3자리마다 쉼표 추가
   };
 
-  // // 파일 첨부 처리 함수
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files[0];
-  //   setFormData({ ...formData, b_image: file }); // 선택된 파일을 상태에 저장
-  // };
-
   // 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -50,66 +46,90 @@ const navigate = useNavigate();
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleBusinessInsert = async (e) => {
-    e.preventDefault();
-  
-    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
-    if (!token) {
-      setMessage("로그인이 필요합니다.");
-      return;
-    }
-  
-    try {
-      const formDataToSend = {
-        b_title: formData.b_title,
-        b_price: formData.b_price.replace(/,/g, ""), // 쉼표 제거
-        b_contents: formData.b_contents,
-        b_link: formData.b_link,
-      };
+  // 폼 제출 시 빈칸 확인 함수
+  const validateForm = () => {
+    let hasError = false;
 
-      console.log(formDataToSend);
-
-      const response = await fetch("http://192.168.0.102:8080/api/biz/create", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json", // ✅ JSON 데이터 전송
-        },
-        body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
-      });
-  
-      if (!response.ok) {
-        throw new Error("등록에 실패했습니다.");
+    // 각 필드가 비어있는지 체크
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key] && key !== "b_image") {  // 이미지 필드는 필수가 아니므로 제외
+        hasError = true;
       }
-  
-      setMessage("성공적으로 등록되었습니다.");
-      setFormData({
-        b_title: "",
-        b_price: "",
-        b_contents: "",
-        b_link: "",
-      });
-  
-      navigate("/businessBoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error("비즈니스 등록 오류:", error);
+    });
+
+    // 빈칸이 있으면 얼럿을 띄우고 반환
+    if (hasError) {
+      alert("빈칸을 확인해주세요.");
+      return true;  // 유효성 검사 실패
     }
+
+    return false; // 유효성 검사 성공
   };
 
-  // 폼 제출 시 빈칸 확인 함수
-  const handleSubmit = () => {
-      let hasError = false;
+  // 비즈니스 등록 함수
+  const handleBusinessInsert = (e) => {
+    e.preventDefault();
 
-      // 각 필드가 비어있는지 체크
-      Object.keys(formData).forEach((key) => {
-        if (!formData[key] && key !== "b_image") {  // 이미지 필드는 필수가 아니므로 제외
-          if (!hasError) {
-            // 첫 번째 빈 필드에 포커스를 맞추기
-            refs[key].current.focus();
-            hasError = true;
-          }
+    // 폼 유효성 검사
+    if (validateForm()) {
+      return; // 유효성 검사 실패 시 등록을 진행하지 않음
+    }
+
+    const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
+    if (!token) {
+      setErrors({ message: "로그인이 필요합니다." });
+      return;
+    }
+
+    // 서버 요청 전에 오류 상태를 초기화
+    setErrors({});
+    setMessage("");
+
+    const formDataToSend = {
+      b_title: formData.b_title,
+      b_price: formData.b_price.replace(/,/g, ""), // 쉼표 제거
+      b_contents: formData.b_contents,
+      b_link: formData.b_link,
+    };
+
+    console.log(formDataToSend);
+
+    fetch(`${BASE_URL}/api/biz/create`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json", // ✅ JSON 데이터 전송
+      },
+      body: JSON.stringify(formDataToSend), // ✅ JSON 문자열로 변환하여 전송
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("등록에 실패했습니다.");
         }
+        return response.json(); // 서버 응답을 JSON으로 반환
+      })
+      .then((data) => {
+        // 서버에서 성공적인 응답을 받은 후 처리
+        setMessage("성공적으로 등록되었습니다.");
+        setFormData({
+          b_title: "",
+          b_price: "",
+          b_contents: "",
+          b_link: "",
+        });
+
+        // 성공 시 오류 메시지 초기화 후 등록 완료 알림 표시
+        setErrors({});
+        alert("등록되었습니다.");
+        navigate("/businessBoardList");
+      })
+      .catch((error) => {
+        // 오류가 발생하면 catch로 들어옵니다
+        setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
+        console.error("비즈니스 등록 오류:", error);
+
+        // 등록 실패 시 바로 알림 표시
+        alert("등록 실패: " + error.message);
       });
   };
 
@@ -167,20 +187,10 @@ const navigate = useNavigate();
               onChange={handleChange} 
             />
           </div>
-
-          {/* 이미지 첨부 입력 */}
-          <div className="register-row">
-            <div className="register-label">사진 첨부</div>
-            <input 
-              type="file" 
-              className="register-text" 
-              name="b_image" 
-              id="b_image" 
-              ref={refs.b_image} 
-              // onChange={handleBusinessInsert} 
-            />
-          </div>
         </div>
+
+        {/* 오류 메시지 표시 */}
+        {errors.message && <div className="error-message">{errors.message}</div>}
 
         <button 
           className="register-submit" 
@@ -191,6 +201,6 @@ const navigate = useNavigate();
       </div>
     </div>
   );
-}
+};
 
 export default BusinessRegister;

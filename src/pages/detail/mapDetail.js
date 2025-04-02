@@ -1,56 +1,54 @@
 import React, { useEffect, useState } from "react";
-import "./map.css"; // 스타일 적용
+import { useLocation } from "react-router-dom";
+import "./map.css";
 
 function MapDetail() {
-  const { kakao } = window;
+  const { state } = useLocation();
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // 카카오 맵 SDK 스크립트 로딩
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=668e283937fb605b2e2fc1571979350b&libraries=services,places`;
-    document.head.appendChild(script);
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(() => {
+        initializeMap();
+      });
+    } else {
+      console.error("카카오 맵 SDK가 로드되지 않았습니다.");
+    }
 
-    script.onload = () => {
-      console.log("카카오 맵 SDK 로드 성공!");  // 로딩 확인
-      if (!window.kakao) {
-        console.error("카카오 맵 SDK가 로드되지 않았습니다.");
-        return;
-      }
-
-      const container = document.getElementById("map"); // 지도 컨테이너
-      if (!container) {
-        console.error("지도 컨테이너가 없습니다!");
-        return;
-      }
+    function initializeMap() {
+      const container = document.getElementById("map");
+      if (!container) return;
 
       const options = {
-        center: new kakao.maps.LatLng(37.49875699165696, 127.02667739922292), // 지도 중심 위치
-        level: 3,  // 지도 확대 레벨
+        center: new window.kakao.maps.LatLng(37.49875699165696, 127.02667739922292),
+        level: 3,
       };
 
-      const newMap = new kakao.maps.Map(container, options);
+      const newMap = new window.kakao.maps.Map(container, options);
       setMap(newMap);
 
-      // 기본 마커 설정
-      const markerPosition = new kakao.maps.LatLng(37.49875699165696, 127.02667739922292);
-      const newMarker = new kakao.maps.Marker({ position: markerPosition });
-      newMarker.setMap(newMap);
-      setMarker(newMarker);
-    };
+      if (state && state.address) {
+        const geocoder = new window.kakao.maps.services.Geocoder();
+        geocoder.addressSearch(state.address, (result, status) => {
+          if (status === window.kakao.maps.services.Status.OK) {
+            const lat = result[0].y;
+            const lng = result[0].x;
+            const coords = new window.kakao.maps.LatLng(lat, lng);
 
-    // 스크립트 로딩 실패 시 오류 처리
-    script.onerror = () => {
-      console.error("카카오 맵 SDK 로딩에 실패했습니다.");
-    };
+            newMap.setCenter(coords);
+            if (marker) marker.setMap(null);
 
-    // 컴포넌트 언마운트 시 스크립트 제거
-    return () => {
-      document.head.removeChild(script);
-    };
+            const newMarker = new window.kakao.maps.Marker({ position: coords });
+            newMarker.setMap(newMap);
+            setMarker(newMarker);
+          } else {
+            alert("주소를 찾을 수 없습니다.");
+          }
+        });
+      }
+    }
   }, []);
 
   const handleSearch = () => {
@@ -59,16 +57,15 @@ function MapDetail() {
       return;
     }
 
-    const places = new kakao.maps.services.Places();
+    const places = new window.kakao.maps.services.Places();
     places.keywordSearch(searchTerm, (data, status) => {
-      if (status === kakao.maps.services.Status.OK) {
+      if (status === window.kakao.maps.services.Status.OK) {
         const { x, y } = data[0];
-        const moveLatLon = new kakao.maps.LatLng(y, x);
+        const moveLatLon = new window.kakao.maps.LatLng(y, x);
         map.setCenter(moveLatLon);
 
-        // 기존 마커 제거 후 새로운 마커 설정
         if (marker) marker.setMap(null);
-        const newMarker = new kakao.maps.Marker({ position: moveLatLon });
+        const newMarker = new window.kakao.maps.Marker({ position: moveLatLon });
         newMarker.setMap(map);
         setMarker(newMarker);
       } else {
@@ -78,8 +75,7 @@ function MapDetail() {
   };
 
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -87,9 +83,8 @@ function MapDetail() {
       <div className="map-detail-content">
         <h2 className="map-detail-title">지도</h2>
         <hr />
-        
+
         <div className="map-all">
-          {/* 🔍 카카오 스타일 검색 UI */}
           <div className="map-search-box">
             <input
               type="text"
@@ -104,7 +99,6 @@ function MapDetail() {
             </button>
           </div>
 
-          {/* 🔍 검색 가이드 메시지 */}
           <div className="map-search-guide">
             <p><strong>tip</strong></p>
             <p>아래와 같은 조합으로 검색하시면 더욱 정확한 결과가 검색됩니다.</p>
@@ -117,7 +111,6 @@ function MapDetail() {
           </div>
         </div>
 
-        {/* 🗺 지도 */}
         <div id="map" className="map" style={{ width: "100%", height: "400px", marginTop: "20px" }}></div>
       </div>
     </div>

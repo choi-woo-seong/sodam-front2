@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const CommunityBoardList = () => {
-const [data, setData] = useState([]);
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
 
@@ -17,7 +19,7 @@ const [data, setData] = useState([]);
           return;
         }
 
-        const response = await fetch("http://192.168.0.102:8080/api/community/searchAll", {
+        const response = await fetch(`${BASE_URL}/api/community/searchAll`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -52,8 +54,9 @@ const [data, setData] = useState([]);
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
 
-  // 총 페이지 수 계산
-  const totalPages = Math.ceil(data.length / postsPerPage);
+    // 총 페이지 수 계산
+    const totalPages = Math.max(1, Math.ceil(data.length / postsPerPage));
+
 
   // 페이지 번호 변경 함수
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -110,7 +113,7 @@ const [data, setData] = useState([]);
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4">등록된 상품이 없습니다.</td>
+                        <td colSpan="4">등록된 데이터가 없습니다.</td>
                       </tr>
                     )}
         </tbody>

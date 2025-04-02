@@ -5,30 +5,54 @@ import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons";
 import "./detail.css";
 
 function BusinessDetail() {
-  const navigate = useNavigate(); // 🔹 페이지 이동을 위한 useNavigate 사용
-  const b_contents = "비즈니스"; // 📌 실제 데이터와 연결 필요
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
   const { id } = useParams(); // URL에서 productId 파라미터 가져오기
-
   // 📌 찜 상태 (DB 연결 전에는 localStorage 사용)
-  const [isBookmarked, setIsBookmarked] = useState(false);
-
-  // 📌 비즈니스 상품 정보
   const [businessDetails, setBusinessDetails] = useState({
     b_title: "비즈니스 제목",
     b_price: "100,000 원",
     b_contents: "비즈니스 상품 설명",
     b_link: "https://www.example.com",
-    username: "작성자", // 작성자 추가
-    createdDate: "작성일", // 작성일 추가
+    ownerloc: "지도",
+    username: "작성자",
+    createdDate: "작성일",
   });
-  
-  // 오류 메시지 상태
-  const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState("");
 
-  // 📌 ID 중복 확인 상태
-  const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({});
+
+  // 비즈니스 데이터 가져오기
+  useEffect(() => {
+    const fetchBusinessDetails = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/biz/businessDetail/${id}`);
+        if (!response.ok) {
+          throw new Error("비즈니스 데이터 조회에 실패했습니다.");
+        }
+
+        const data = await response.json();
+        if (data) {
+          setBusinessDetails({
+            b_title: data.b_title || "제목",
+            b_price: data.b_price || "금액",
+            b_contents: data.b_contents || "설명",
+            b_link: data.b_link || "http://링크.com",
+            ownerloc: data.ownerloc || "지도",
+            username: data.username || "작성자",
+            createdDate: data.createdDate || "작성일",
+          });
+        }
+      } catch (error) {
+        console.error("비즈니스 데이터 가져오기 실패:", error);
+      }
+    };
+
+    fetchBusinessDetails();
+    fetchFavoriteDetails();
+  }, [id]);
 
   const fetchFavoriteDetails = async (e) => {
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
@@ -37,7 +61,7 @@ function BusinessDetail() {
       setMessage("로그인이 필요합니다.");
       return;
     }
-    
+
     try {
       // 📌 찜 추가 (배열에 추가)
       const formDataToSend = {
@@ -46,7 +70,7 @@ function BusinessDetail() {
         targetPgm:"businessDetail",
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -70,43 +94,8 @@ function BusinessDetail() {
     }
   };
 
-
-  // 📌 1️⃣ 마운트 시 localStorage에서 찜 여부 확인
-  useEffect(() => {
-    // 비즈니스 데이터 API 호출 (예시로 제품 정보 호출)
-    const fetchBusinessDetails = async () => {
-      try {
-        const response = await fetch(`http://192.168.0.102:8080/api/biz/businessDetail/${id}`); // 예시 API URL
-        if (!response.ok) {
-          throw new Error("비즈니스 데이터 조회에 실패했습니다.");
-        }
-
-        const data = await response.json();
-
-        if (data) {
-          setBusinessDetails({
-            b_title: data.b_title || "제목",
-            b_price: data.b_price || " 금액",
-            b_contents: data.b_contents || " 설명",
-            b_link: data.b_link || "http://링크.com",
-            username: data.username || "작성자", // 작성자 데이터 추가
-            createdDate: data.createdDate || "작성일", // 작성일 데이터 추가
-            b_image: data.b_image || null, // 상품 이미지 추가
-          });
-        } else {
-          console.error("빈 데이터 응답:", data);
-        }
-      } catch (error) {
-        console.error("비즈니스 데이터 가져오기 실패:", error);
-      }
-    };
-
-    fetchBusinessDetails();
-    fetchFavoriteDetails();
-  }, [id]); // 빈 배열을 두어 페이지 로드시 한 번만 실행
-
-  // 📌 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
-  const handleBookmarkClick = async (e) => {
+   // 📌 찜 버튼 클릭 시 실행 (localStorage에서 저장/삭제)
+   const handleBookmarkClick = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
@@ -124,7 +113,7 @@ function BusinessDetail() {
 
         console.log(formDataToSend)
     
-        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -138,7 +127,7 @@ function BusinessDetail() {
         }
     
         setMessage("성공적으로 등록되었습니다.");
-    
+     
       } catch (error) {
         setErrors(error.message);
         console.error("찜 등록 오류:", error);
@@ -146,9 +135,14 @@ function BusinessDetail() {
       fetchFavoriteDetails();
   };
 
-  // 🔹 목록 버튼 클릭 시 이동하는 함수
+  // 목록으로 돌아가기
   const handleGoToList = () => {
-    navigate("/businessBoardList"); // 🔹 "/businessBoardList" 페이지로 이동
+    navigate("/businessBoardList"); // "/businessBoardList" 페이지로 이동
+  };
+
+  // 길 찾기 버튼 클릭 시 mapDetail 페이지로 이동
+  const handleGoToMap = () => {
+    navigate("/mapDetail", { state: { address: businessDetails.ownerloc } });
   };
 
   return (
@@ -160,19 +154,19 @@ function BusinessDetail() {
         {/* 작성자 아이콘과 작성일 표시 */}
         <div className="detail-author-date">
           <span className="author">
-           <FontAwesomeIcon icon={faUser} /> &nbsp;{/* 사람 아이콘 추가 */}
-                       {businessDetails.username}&nbsp;
-                     </span>
-                     <span className="created-date">
-                      작성일: {new Date(businessDetails.createdDate).toLocaleDateString()}
-                      </span>
+            <FontAwesomeIcon icon={faUser} /> &nbsp;
+            {businessDetails.username}&nbsp;
+          </span>
+          <span className="created-date">
+            작성일: {new Date(businessDetails.createdDate).toLocaleDateString()}
+          </span>
         </div>
 
         <div className="detail-header">
           <FontAwesomeIcon
             icon={faBookmark}
             className={`bookmark-icon ${isBookmarked ? "active" : ""}`}
-            onClick={handleBookmarkClick}
+            onClick={handleBookmarkClick} // 찜 버튼 클릭 핸들러 필요
           />
         </div>
 
@@ -200,18 +194,6 @@ function BusinessDetail() {
             />
           </div>
 
-          {/* 비즈니스 이미지가 있을 경우 표시 */}
-          {/* {businessDetails.b_image && (
-            <div className="detail-row">
-              <div className="detail-label">사진</div>
-              <img
-                src={businessDetails.b_image} // 이미지 URL
-                alt="비즈니스 이미지"
-                className="business-image"
-              />
-            </div>
-          )} */}
-
           <div className="detail-row content-row">
             <div className="detail-label">내용</div>
             <textarea
@@ -224,21 +206,35 @@ function BusinessDetail() {
           </div>
           <div className="detail-row">
             <div className="detail-label">링크</div>
+            <a
+              href={businessDetails.b_link} // 링크 클릭 시 해당 URL로 이동
+              target="_blank" // 새 창에서 링크 열리도록 설정
+              rel="noopener noreferrer" // 보안 설정
+              className="detail-text"
+            >
+              {businessDetails.b_link} {/* 링크 텍스트로 URL 표시 */}
+            </a>
+          </div>
+
+
+          <div className="detail-row">
+            <div className="detail-label">지도</div>
             <input
               type="text"
               className="detail-text"
-              name="b_link"
-              id="b_link"
-              value={businessDetails.b_link}
+              name="ownerloc"
+              id="ownerloc"
+              value={businessDetails.ownerloc}
               disabled={true}
             />
           </div>
         </div>
-        <div className="map-link">
-                <p className="map" onClick={() => navigate("/mapDetail")}>
-                <i class="fa-solid fa-location-dot"></i>&nbsp;길 찾기</p>
-            </div>
 
+        <div className="map-link">
+          <p className="mapbutton" onClick={handleGoToMap}>
+            <i className="fa-solid fa-location-dot"></i>&nbsp;길 찾기
+          </p>
+        </div>
 
         <button className="detail-button" onClick={handleGoToList}>
           목록

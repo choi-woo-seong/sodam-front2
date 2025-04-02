@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const NoticeRegister = () => {
-    const navigate = useNavigate();
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const navigate = useNavigate();
   
   // 공지 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
@@ -13,24 +14,17 @@ const NoticeRegister = () => {
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
   const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState("");
-  
-
-  // 중복 확인 상태
-  const [isDuplicate, setIsDuplicate] = useState(false);
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
     n_title: useRef(null),
     n_content: useRef(null),
   };
-  
 
   // 폼의 입력값 변경 시 호출되는 함수
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
@@ -48,13 +42,20 @@ const NoticeRegister = () => {
 
     return Object.keys(newErrors).length === 0;
   };
+
   const handleNoticeInsert = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    // 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
 
     if (!token) {
-      setMessage("로그인이 필요합니다.");
+      alert("로그인이 필요합니다.");
       return;
     }
 
@@ -63,8 +64,8 @@ const NoticeRegister = () => {
         n_title: formData.n_title,
         n_content: formData.n_content,
       };
-    
-      const response = await fetch("http://192.168.0.102:8080/api/notice/create", {
+
+      const response = await fetch(`${BASE_URL}/api/notice/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -77,25 +78,16 @@ const NoticeRegister = () => {
         throw new Error("등록에 실패했습니다.");
       }
 
-      setMessage("성공적으로 등록되었습니다.");
+      alert("등록되었습니다."); // 등록 성공 시 alert 표시
       setFormData({
         n_title: "",
         n_content: "",
       });
       navigate("/noticeBoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error("상품 등록 오류:", error);
-    }
-  };
 
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      alert("등록되었습니다.");
-    } else {
-      alert("빈칸을 확인해주세요.");
+    } catch (error) {
+      console.error("공지 등록 오류:", error);
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -117,7 +109,6 @@ const NoticeRegister = () => {
               value={formData.n_title}
               onChange={handleChange}
             />
-            {errors.n_title && <span className="error">{errors.n_title}</span>}
           </div>
 
           {/* 내용 입력 */}
@@ -131,13 +122,11 @@ const NoticeRegister = () => {
               value={formData.n_content}
               onChange={handleChange}
             />
-            {errors.n_contents && <span className="error">{errors.n_content}</span>}
           </div>
         </div>
 
         {/* 제출 버튼 */}
-        <button className="register-submit" type="submit"
-         onClick={handleNoticeInsert} >
+        <button className="register-submit" type="button" onClick={handleNoticeInsert}>
           등록
         </button>
       </div>

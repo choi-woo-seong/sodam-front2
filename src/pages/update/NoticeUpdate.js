@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 
 const NoticeUpdate = ({ noticeId }) => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   // 공지 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     n_title: "",
@@ -30,7 +32,7 @@ const NoticeUpdate = ({ noticeId }) => {
   // 중복 확인 함수
   const handleDuplicateCheck = async () => {
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/notice/check-duplicate?title=${formData.n_title}`);
+      const response = await fetch(`${BASE_URL}/api/notice/check-duplicate?title=${formData.n_title}`);
       const data = await response.json();
 
       if (data.isDuplicate) {
@@ -74,7 +76,7 @@ const NoticeUpdate = ({ noticeId }) => {
       }
 
       // PUT 요청으로 공지 수정
-      fetch(`http://192.168.0.102:8080/api/notice/${noticeId}`, {
+      fetch(`${BASE_URL}/api/notice/${noticeId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +103,7 @@ const NoticeUpdate = ({ noticeId }) => {
   // 공지 삭제 함수
   const handleNoticeDelete = () => {
     if (window.confirm("정말로 이 공지를 삭제하시겠습니까?")) {
-      fetch(`http://192.168.0.102:8080/api/notice/${noticeId}`, {
+      fetch(`${BASE_URL}/api/notice/${noticeId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

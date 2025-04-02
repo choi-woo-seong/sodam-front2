@@ -5,6 +5,8 @@ import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons"; // faUse
 import "./detail.css";
 
 function ProductDetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate(); // 🔹 페이지 이동을 위한 useNavigate 사용
   const p_contents = "상품"; // 📌 실제 데이터와 연결 필요
 
@@ -12,7 +14,6 @@ function ProductDetail() {
 
   // 📌 찜 상태 (DB 연결 전에는 localStorage 사용)
   const [isBookmarked, setIsBookmarked] = useState(false);
-
 
   // 오류 메시지 상태
   const [errors, setErrors] = useState({});
@@ -24,6 +25,7 @@ function ProductDetail() {
     p_price: "상품 금액",
     p_contents: "상품 설명",
     p_link: "http://상품링크.com",
+    ownerloc: "지도",
     username: "작성자", // 작성자 추가
     createdAt: "작성일", // 작성일 추가
     p_image: null, // 상품 이미지 추가
@@ -33,7 +35,7 @@ function ProductDetail() {
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   const fetchProductDetails = async () => {
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/products/productDetail/${id}`); // 예시 API URL
+      const response = await fetch(`${BASE_URL}/api/products/productDetail/${id}`); // 예시 API URL
       if (!response.ok) {
         throw new Error("상품 데이터 조회에 실패했습니다.");
       }
@@ -46,6 +48,7 @@ function ProductDetail() {
           p_price: data.p_price || "상품 금액",
           p_contents: data.p_contents || "상품 설명",
           p_link: data.p_link || "http://상품링크.com",
+          ownerloc: data.ownerloc || "지도",
           username: data.username || "작성자", // 작성자 데이터 추가
           createdAt: data.createdAt || "작성일", // 작성일 데이터 추가
           p_image: data.p_image || null, // 상품 이미지 추가
@@ -65,7 +68,7 @@ function ProductDetail() {
       setMessage("로그인이 필요합니다.");
       return;
     }
-    
+
     try {
       // 📌 찜 추가 (배열에 추가)
       const formDataToSend = {
@@ -74,7 +77,7 @@ function ProductDetail() {
         targetPgm:"productDetail",
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -128,7 +131,7 @@ function ProductDetail() {
 
         console.log(formDataToSend)
     
-        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -153,6 +156,11 @@ function ProductDetail() {
   // 🔹 목록 버튼 클릭 시 이동하는 함수
   const handleGoToList = () => {
     navigate("/productBoardList"); // 🔹 "/noticelist" 페이지로 이동
+  };
+
+  // 🔹 길찾기 버튼 클릭 시 MapDetail 페이지로 이동
+  const handleGoToMap = () => {
+    navigate("/mapDetail", { state: { address: productDetails.ownerloc } }); // `ownerloc` 값 전달
   };
 
   return (
@@ -227,22 +235,35 @@ function ProductDetail() {
             ></textarea>
           </div>
           <div className="detail-row">
-            <div className="detail-label">링크</div>
+          <div className="detail-label">링크</div>
+          <a
+            href={productDetails.p_link} // 링크를 클릭했을 때 해당 페이지로 이동
+            target="_blank" // 새 창에서 열리도록 설정
+            rel="noopener noreferrer" // 보안 설정
+            className="detail-text"
+          >
+            {productDetails.p_link} {/* 링크 텍스트로 URL 표시 */}
+          </a>
+        </div>
+
+          <div className="detail-row">
+            <div className="detail-label">지도</div>
             <input
               type="text"
               className="detail-text"
-              name="p_link"
-              id="p_link"
-              value={productDetails.p_link}
+              name="ownerloc"
+              id="ownerloc"
+              value={productDetails.ownerloc}
               disabled={true}
             />
           </div>
         </div>
 
         <div className="map-link">
-                <p className="map" onClick={() => navigate("/mapDetail")}>
-                <i class="fa-solid fa-location-dot"></i>&nbsp;길 찾기</p>
-            </div>
+          <p className="mapbutton" onClick={handleGoToMap}>
+            <i className="fa-solid fa-location-dot"></i>&nbsp;길 찾기
+          </p>
+        </div>
 
         <button className="detail-button" onClick={handleGoToList}>
           목록

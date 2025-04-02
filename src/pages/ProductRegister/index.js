@@ -2,7 +2,10 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
+  
   // 상품 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
     p_title: "",
@@ -42,12 +45,6 @@ const ProductRegister = () => {
     }
   };
 
-  // // 파일 첨부 처리
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files[0];
-  //   setFormData({ ...formData });
-  // };
-
   // 폼 유효성 검사 함수
   const validateForm = () => {
     const newErrors = {};
@@ -86,6 +83,12 @@ const ProductRegister = () => {
   const handleProductInsert = async (e) => {
     e.preventDefault();
   
+    // 폼 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+  
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
     if (!token) {
       setMessage("로그인이 필요합니다.");
@@ -100,7 +103,7 @@ const ProductRegister = () => {
         p_link: formData.p_link,
       };
   
-      const response = await fetch("http://192.168.0.102:8080/api/products/create", {
+      const response = await fetch(`${BASE_URL}/api/products/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -121,21 +124,15 @@ const ProductRegister = () => {
         p_link: "",
       });
   
+      alert("등록되었습니다."); // 등록 성공 시 alert 표시
       navigate("/productBoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error("상품 등록 오류:", error);
-    }
-  };
-  
 
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      alert("등록되었습니다.");
-    } else {
-      alert("빈칸을 확인해주세요.");
+    } catch (error) {
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
+      console.error("상품 등록 오류:", error);
+
+      // 등록 실패 시 바로 alert 표시
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -200,18 +197,7 @@ const ProductRegister = () => {
             />
           </div>
 
-          {/* 이미지 파일 첨부 */}
-          <div className="register-row">
-            <div className="register-label">사진 첨부</div>
-            <input
-              type="file"
-              className="register-text"
-              name="p_image"
-              id="p_image"
-              ref={refs.p_image}
-              // onChange={handleFileChange}
-            />
-          </div>
+       
         </div>
 
         {/* 제출 버튼 */}

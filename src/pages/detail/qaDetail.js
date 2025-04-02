@@ -5,6 +5,8 @@ import { faBookmark, faUser, faPen, faTrash } from "@fortawesome/free-solid-svg-
 import "./detail.css";
 
 function QADetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
   const { id } = useParams(); // URL에서 productId 파라미터 가져오기
   const [a_comments, setComments] = useState([]);  // 댓글 목록
@@ -20,30 +22,29 @@ function QADetail() {
   const admin = localStorage.getItem("userName"); // 관리자 정보
 
   // 댓글 수정 함수
-const handleEditComment = (id, content) => {
-  setEditingCommentId(id);  // 수정할 댓글 ID 설정
-  setEditedComment(content); // 수정할 때 기존 댓글 내용으로 설정
-  setEditedComment(""); // 수정 후 인풋 초기화
-};
+  const handleEditComment = (id, content) => {
+    setEditingCommentId(id);  // 수정할 댓글 ID 설정
+    setEditedComment(content); // 수정할 때 기존 댓글 내용으로 설정
+    setEditedComment(""); // 수정 후 인풋 초기화
+  };
 
-// 댓글 수정 시 포커스를 자동으로 적용하기 위해 useEffect 사용
-useEffect(() => {
-  if (editingCommentId !== null) {
-    // 댓글 수정 모드일 때만 포커스를 주도록 설정
-    setTimeout(() => {
-      if (commentInputRef.current) {
-        commentInputRef.current.focus();
-      }
-    }, 0);
-  }
-}, [editingCommentId]); // editingCommentId가 변경될 때마다 포커스 처리
-
+  // 댓글 수정 시 포커스를 자동으로 적용하기 위해 useEffect 사용
+  useEffect(() => {
+    if (editingCommentId !== null) {
+      // 댓글 수정 모드일 때만 포커스를 주도록 설정
+      setTimeout(() => {
+        if (commentInputRef.current) {
+          commentInputRef.current.focus();
+        }
+      }, 0);
+    }
+  }, [editingCommentId]); // editingCommentId가 변경될 때마다 포커스 처리
 
   // 댓글 수정 저장 함수
   const handleUpdateComment = async (id) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch(`http://192.168.0.102:8080/api/answer/update/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/answer/update/${id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -57,16 +58,18 @@ useEffect(() => {
       setEditingCommentId(null);
       setEditedComment(""); // 수정 후 인풋 초기화
       fetchAnswerSelecte();
+      alert("댓글이 성공적으로 수정되었습니다."); // 수정 성공 시 알림
     } catch (error) {
       console.error("댓글 수정 오류:", error);
+      alert("댓글 수정에 실패했습니다: " + error.message); // 수정 실패 시 알림
     }
   };
 
-    // 댓글 삭제 저장 함수
+  // 댓글 삭제 저장 함수
   const handleDeleteComment = async (id) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch(`http://192.168.0.102:8080/api/answer/delete/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/answer/delete/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}`,
                   "Content-Type": "application/json", 
@@ -75,12 +78,13 @@ useEffect(() => {
       if (!response.ok) throw new Error("댓글 삭제 실패");
 
       fetchAnswerSelecte();
-      window.location.reload(); //화면 새로고침용
+      alert("댓글이 삭제되었습니다."); // 삭제 성공 시 알림
+      window.location.reload(); // 화면 새로고침용
     } catch (error) {
       console.error("댓글 삭제 오류:", error);
+      alert("댓글 삭제에 실패했습니다: " + error.message); // 삭제 실패 시 알림
     }
   };
-
 
   // 댓글 등록 함수
   const handleCommentSubmit = async (e) => {
@@ -107,7 +111,7 @@ useEffect(() => {
       };
 
       try {
-        const response = await fetch("http://192.168.0.102:8080/api/answer/create", {
+        const response = await fetch(`${BASE_URL}/api/answer/create`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`, // JWT 토큰 포함
@@ -120,18 +124,16 @@ useEffect(() => {
           throw new Error("등록에 실패했습니다.");
         }
 
-        alert("성공적으로 등록되었습니다.");
+        alert("답변이 성공적으로 등록되었습니다."); // 등록 성공 시 알림
         fetchAnswerSelecte();
         setComment(""); // 입력창 초기화
       } catch (error) {
-        alert(error.message);
+        alert("답변 등록에 실패했습니다: " + error.message); // 등록 실패 시 알림
       }
     } else {
       alert("답변은 관리자만 입력가능 합니다.");
     }
   };
-
-
 
   // 목록 버튼 클릭 시 이동하는 함수
   const handleGoToList = () => {
@@ -141,7 +143,7 @@ useEffect(() => {
   // API에서 상품 상세 데이터 가져오기
   const fetchAnswerSelecte = async () => {
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/answer/byQuestion/${id}`); // 예시 API URL
+      const response = await fetch(`${BASE_URL}/api/answer/byQuestion/${id}`); // 예시 API URL
       if (!response.ok) {
         throw new Error("데이터 조회에 실패했습니다.");
       }
@@ -166,7 +168,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchQADetails = async () => {
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/question/questionDetail/${id}`); // 예시 API URL
+        const response = await fetch(`${BASE_URL}/api/question/questionDetail/${id}`); // 예시 API URL
         if (!response.ok) {
           throw new Error("데이터 조회에 실패했습니다.");
         }
@@ -204,8 +206,6 @@ useEffect(() => {
             작성일: {new Date(qaDetails.createdAt).toLocaleDateString()}
           </span>
         </div>
-
-
 
         <div className="detail-box">
           <div className="detail-row">

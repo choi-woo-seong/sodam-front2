@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import "../styles/WriteBoardList.css";
 
 const PersonWriteList = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ const PersonWriteList = () => {
   
     const getTotalPages = (category) => {
       const postsCategory = posts[category] || [];
-      return Math.ceil(postsCategory.length / postsPerPage);
+      return Math.max(1,Math.ceil(postsCategory.length / postsPerPage));
     };
   
     const getCurrentPosts = (category, currentPage) => {
@@ -31,16 +32,20 @@ const PersonWriteList = () => {
       return postsCategory.slice(indexOfFirstPost, indexOfLastPost);
     };
   
-    const paginate = (pageNumber, setPageState) => setPageState(pageNumber);
+    const paginate = (pageNumber, setPageState, category) => {
+      const totalPages = getTotalPages(category);
+      setPageState(Math.max(1,Math.min(pageNumber,totalPages)));
+    };
     const goToFirstPage = (setPageState) => setPageState(1);
     const goToLastPage = (setPageState, category) => setPageState(getTotalPages(category));
   
     const getPageNumbers = (currentPage, category) => {
       const pageNumbers = [];
       const pageLimit = 3;
-      let startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
-      let endPage = startPage + pageLimit - 1;
       const totalPages = getTotalPages(category);
+      let startPage = Math.max(1,Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1);
+      let endPage = Math.min(startPage + pageLimit - 1,totalPages);
+      
   
       if (endPage > totalPages) {
         endPage = totalPages;
@@ -62,7 +67,7 @@ const PersonWriteList = () => {
             return;
           }
   
-          const response = await fetch("http://192.168.0.102:8080/mypage/posts", {
+          const response = await fetch(`${BASE_URL}/mypage/posts`, {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${token}`,
@@ -90,6 +95,8 @@ const PersonWriteList = () => {
   
     return (
       <div className="write-list-container">
+          <h3>내가 쓴 글 목록 </h3>
+          <hr></hr>
         <div className="my-link">
           <p className="my" onClick={() => navigate("/personMypage")}> 
             <i className="fas fa-user-circle clickable"></i>&nbsp;개인정보 수정
@@ -106,7 +113,8 @@ const PersonWriteList = () => {
             </tr>
           </thead>
           <tbody>
-            {getCurrentPosts("communities", currentPage3).map((post, index) => (
+          {getCurrentPosts("communities", currentPage3).length > 0 ? (
+            getCurrentPosts("communities", currentPage3).map((post, index) => (
               <tr key={post.id}>
                 <td>{index + 1}</td>
                 <td>
@@ -115,9 +123,14 @@ const PersonWriteList = () => {
                   </Link>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="2">등록된 데이터가 없습니다.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
   
         <div className="write-pagination">
           <span onClick={() => goToFirstPage(setCurrentPage3)}>&lt;&lt;</span>
@@ -139,7 +152,8 @@ const PersonWriteList = () => {
             </tr>
           </thead>
           <tbody>
-            {getCurrentPosts("questions", currentPage4).map((post, index) => (
+          {getCurrentPosts("questions", currentPage4).length > 0 ? (
+            getCurrentPosts("questions", currentPage4).map((post, index) => (
               <tr key={post.id}>
                 <td>{index + 1}</td>
                 <td>
@@ -148,10 +162,14 @@ const PersonWriteList = () => {
                   </Link>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-  
+            ))
+          ) : (
+            <tr>
+              <td colSpan="2">등록된 데이터가 없습니다.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
         <div className="write-pagination">
           <span onClick={() => goToFirstPage(setCurrentPage4)}>&lt;&lt;</span>
           <span onClick={() => setCurrentPage4(currentPage4 > 1 ? currentPage4 - 1 : 1)}>&lt;</span>

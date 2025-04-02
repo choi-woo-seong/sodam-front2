@@ -5,6 +5,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import BusinessPasswordPopup from "./BusinessPasswordPopup";
 
 function BusinessMyPage() {
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
@@ -30,8 +33,7 @@ function BusinessMyPage() {
                 return;
             }
 
-            const response = await fetch(
-                "http://192.168.0.102:8080/api/users/business/info",
+            const response = await fetch(`${BASE_URL}/api/users/business/info`,
                 {
                     method: "GET",
                     headers: {
@@ -61,69 +63,91 @@ function BusinessMyPage() {
             [e.target.name]: e.target.value
         });
     };
-    // 수정 폼 유효성 검사
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.name) 
+    
+        if (!formData.name) {
             newErrors.name = "이름을 입력하세요.";
-        if (!formData.ownername) 
+        }
+        if (!formData.ownername) {
             newErrors.ownername = "사업자 명을 입력하세요.";
-        if (!formData.ownernum) 
-            newErrors.ownernum = "사업자 번호을 입력하세요.";
-        if (!formData.ownerloc) 
-            newErrors.ownerloc = "사업자 주소을 입력하세요.";
-        if (!formData.email) 
+        }
+        if (!formData.ownernum) {
+            newErrors.ownernum = "사업자 번호를 입력하세요.";
+        }
+        if (!formData.ownerloc) {
+            newErrors.ownerloc = "사업자 주소를 입력하세요.";
+        }
+    
+        if (!formData.email) {
             newErrors.email = "이메일을 입력하세요.";
-        if (!formData.phone1) 
-            newErrors.phone1 = "연락처1을 입력하세요.";
-        if (!formData.phone2) 
-            newErrors.phone2 = "연락처2를 입력하세요.";
+        } else {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(formData.email)) {
+                newErrors.email = "유효한 이메일을 입력하세요.";
+            } else if (!formData.email.endsWith(".com")) {
+                newErrors.email = ".com으로 끝나는 이메일을 입력하세요.";
+            }
+        }
+    
+        if (!formData.phone1) {
+            newErrors.phone1 = "전화번호를 입력하세요.";
+        }
+        if (!formData.phone2) {
+            newErrors.phone2 = "휴대전화를 입력하세요.";
+        }
+    
         setErrors(newErrors);
-
-        return Object
-            .keys(newErrors)
-            .length === 0;
+    
+        // 🚀 한 번만 alert 실행
+        if (Object.keys(newErrors).length > 0) {
+            alert(Object.values(newErrors).join("\n"));
+            const firstErrorKey = Object.keys(newErrors)[0];
+            const firstErrorField = document.querySelector(`[name="${firstErrorKey}"]`);
+            if (firstErrorField) firstErrorField.focus();
+            return false;
+        }
+    
+        return true;
     };
+    
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            const token = localStorage.getItem("jwt");
-            try {
-                const response = await fetch(
-                    `http://192.168.0.102:8080/api/users/business/update`,
-                    {
-                        method: "PUT",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        },
-                        credentials: "include",
-                        body: JSON.stringify(formData),
-                        mode: "cors"
-                    }
-                );
-
-                if (!response.ok) 
-                    throw new Error("수정 실패");
-                
-                // 알림 메시지 표시
-                alert("수정이 완료되었습니다.");
-                navigate(""); // 수정 후 상세 페이지로 이동
-            } catch (error) {
-                console.error("수정 중 오류 발생:", error);
-                alert("수정 중 오류가 발생했습니다.");
-            }
-        } else {
-            alert("빈칸을 확인해주세요.");
+        if (!validateForm()) return; // 🚀 validateForm이 실패하면 여기서 종료
+    
+        const token = localStorage.getItem("jwt");
+        try {
+            const response = await fetch(
+                    `${BASE_URL}/api/users/business/update`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(formData),
+                    mode: "cors"
+                }
+            );
+    
+            if (!response.ok) throw new Error("수정 실패");
+    
+            alert("수정이 완료되었습니다.");
+            navigate(""); // 수정 후 이동
+        } catch (error) {
+            console.error("수정 중 오류 발생:", error);
+            alert("수정 중 오류가 발생했습니다.");
         }
     };
+    
     const setDelete = async (e) => {
         if (validateForm()) {
             const token = localStorage.getItem("jwt");
             try {
-                const response = await fetch(
-                    `http://192.168.0.102:8080/api/users/business/delete`,
+                const response = await fetch(`http://192.168.0.102:8080/api/users/business/delete`,
                     {
                         method: "DELETE",
                         headers: {
@@ -232,21 +256,50 @@ function BusinessMyPage() {
                         onChange={handleChange}/>
                 </div>
                 <div className="input-group">
-                    <label>연락처1 수정</label>
-                    <input
-                        type="text"
-                        name="phone1"
-                        value={formData.phone1}
-                        onChange={handleChange}/>
-                </div>
-                <div className="input-group">
-                    <label>연락처2 수정</label>
-                    <input
-                        type="text"
-                        name="phone2"
-                        value={formData.phone2}
-                        onChange={handleChange}/>
-                </div>
+                <label>전화번호 수정</label>
+                <input
+                    type="text"
+                    name="phone1"
+                    value={formData.phone1}
+                    onChange={(e) => {
+                        // 숫자만 입력할 수 있도록 필터링
+                        const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자만 남기기
+                        if (value.length <= 11) {  // 11자 이상 입력되지 않도록 제한
+                            setFormData({
+                                ...formData,
+                                phone1: value
+                            });
+                        }
+                    }}
+                    inputMode="numeric" // 숫자 전용 키패드 표시
+                    maxLength="11" // 최대 길이 11자
+                    minLength="11" // 최소 길이 11자
+                    required
+                />
+            </div>
+            <div className="input-group">
+                <label>휴대전화 수정</label>
+                <input
+                    type="text"
+                    name="phone2"
+                    value={formData.phone2}
+                    onChange={(e) => {
+                        // 숫자만 입력할 수 있도록 필터링
+                        const value = e.target.value.replace(/[^0-9]/g, '');  // 숫자만 남기기
+                        if (value.length <= 11) {  // 11자 이상 입력되지 않도록 제한
+                            setFormData({
+                                ...formData,
+                                phone2: value
+                            });
+                        }
+                    }}
+                    inputMode="numeric" // 숫자 전용 키패드 표시
+                    maxLength="11" // 최대 길이 11자
+                    minLength="11" // 최소 길이 11자
+                    required
+                />
+            </div>
+
                 
                 <div className="btn1">
                     <button type="button" className="submit-btn1" onClick={handleDelete}>탈퇴</button>
@@ -264,3 +317,9 @@ function BusinessMyPage() {
 }
 
 export default BusinessMyPage;
+
+
+
+
+
+

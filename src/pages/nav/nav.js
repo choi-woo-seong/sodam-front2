@@ -22,6 +22,7 @@ function Nav() {
     localStorage.removeItem('userName'); // 🔥 `userName` 키 삭제
     localStorage.removeItem("recentlyViewed"); // 🔹 최근 본 항목 삭제
     localStorage.removeItem('jwt');
+    localStorage.removeItem('userType');
     setUserName(null); // 상태 초기화
 
     alert("로그아웃되었습니다.");
@@ -37,10 +38,32 @@ function Nav() {
     }
   };
 
+  const handleNameClick = () => {
+    const userType = localStorage.getItem('userType'); // 🔥 userType 가져오기
+    if (userType === 'buser') {
+      navigate('/businessMypage');
+    } else {
+      navigate('/personMypage');
+    }
+  };
+
+  // 🔹 네비게이션 처리 함수 (상품등록, 비즈니스 등록 접근 제한)
+  const handleNavigation = (page) => {
+    const userType = localStorage.getItem('userType'); // 🔥 userType 가져오기
+    if (userType === 'nuser') {
+      // 일반회원은 상품 등록과 비즈니스 등록에 접근할 수 없습니다
+      if (page === '/productRegister' || page === '/businessRegister') {
+        alert("일반회원은 이 페이지에 접근할 수 없습니다.");
+        return;
+      }
+    }
+    navigate(page); // 조건이 맞으면 이동
+  };
+
   return (
     <nav className="navbar">
       <div className="nav-user">
-        <span id="user-name">{userName}님</span>
+        <span id="user-name" onClick={handleNameClick}>{userName}님</span>
         <span onClick={() => navigate('/bookMarkBoardList')}>찜</span>
         <span onClick={handleLogout}>로그아웃</span>
         <i className="fas fa-user-circle clickable" onClick={handleProfileClick}></i>
@@ -69,14 +92,14 @@ function Nav() {
           <div className="nav-item-container">
             <button className="nav-item" data-page="product">상품</button>
             <div className="submenu">
-              <button data-page="product" onClick={() => navigate('/productRegister')}>상품 등록</button>
+              <button data-page="product" onClick={() => handleNavigation('/productRegister')}>상품 등록</button>
               <button data-page="product" onClick={() => navigate('/productBoardList')}>상품 보기</button>
             </div>
           </div>
           <div className="nav-item-container">
             <button className="nav-item" data-page="business">비즈니스</button>
             <div className="submenu">
-              <button data-page="business" onClick={() => navigate('/businessRegister')}>비즈니스 등록</button>
+              <button data-page="business" onClick={() => handleNavigation('/businessRegister')}>비즈니스 등록</button>
               <button data-page="business" onClick={() => navigate('/businessBoardList')}>비즈니스 보기</button>
             </div>
           </div>

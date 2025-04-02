@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const BusinessUpdate = () => {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const { id } = useParams(); // URL에서 ID 가져오기
   const navigate = useNavigate();
   const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
@@ -29,7 +31,7 @@ const BusinessUpdate = () => {
   useEffect(() => {
     const fetchBusinessDetails = async () => {
       try {
-        const response = await fetch(`http://192.168.0.102:8080/api/biz/businessDetail/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/biz/businessDetail/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -82,7 +84,7 @@ const BusinessUpdate = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/biz/update/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/biz/update/${id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -109,7 +111,7 @@ const BusinessUpdate = () => {
     if (!window.confirm("정말로 이 비즈니스를 삭제하시겠습니까?")) return;
 
     try {
-      const response = await fetch(`http://192.168.0.102:8080/api/biz/delete/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/biz/delete/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

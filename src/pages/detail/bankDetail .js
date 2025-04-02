@@ -6,6 +6,8 @@ import { faUser } from "@fortawesome/free-solid-svg-icons"; // 작성자 아이�
 import "./detail.css";
 
 function BankDetail() {
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate(); // 🔹 페이지 이동을 위한 useNavigate 사용
   const g_contents = "금융"; // 📌 실제 데이터와 연결 필요
 
@@ -24,7 +26,7 @@ function BankDetail() {
 const [bankDetails, setBankDetails] = useState({
   g_title: "금융 상품 제목",
   g_name: "관리자", // 작성자 추가
-  g_createdAt: "2025-03-19", // 작성일 추가
+  createdAt: "2025-03-19", // 작성일 추가
   irt: "", // 금리
   lnLmt: "", // 대출한도
   finPrdNm: "", // 금리상품명
@@ -54,7 +56,7 @@ const [bankDetails, setBankDetails] = useState({
         targetType: "GOV",
       };
 
-      const response = await fetch("http://192.168.0.102:8080/api/bookmark/check", {
+      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -84,18 +86,20 @@ const [bankDetails, setBankDetails] = useState({
    // 상품 데이터 API 호출 (예시로 제품 정보 호출)
   const fetchBankDetails = async () => {
   try {
-    const response = await fetch(`http://192.168.0.102:8080/api/gov/govDetail/${id}`); // 예시 API URL
+    const response = await fetch(`${BASE_URL}/api/gov/govDetail/${id}`); // 예시 API URL
     if (!response.ok) {
       throw new Error("금융 데이터 조회에 실패했습니다.");
     }
 
     const data = await response.json();
 
+    console.log(data);
+
     if (data) {
       setBankDetails({
         g_title: data.g_title || "제목",
         g_name: data.g_name || "작성자", // 작성자 데이터 추가
-        g_createdDate: data.g_createdDate || "작성일", // 작성일 데이터 추가
+        createdAt: data.createdAt || "작성일", // 작성일 데이터 추가
         irt: data.irt || "", // 금리
         lnLmt: data.lnLmt || "", // 대출한도
         finPrdNm: data.finPrdNm || "", // 금리상품명
@@ -138,7 +142,7 @@ const [bankDetails, setBankDetails] = useState({
 
         console.log(formDataToSend)
     
-        const response = await fetch("http://192.168.0.102:8080/api/bookmark/toggle", {
+        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -175,9 +179,10 @@ const [bankDetails, setBankDetails] = useState({
         <div className="detail-author-date">
           <span className="author">
             <FontAwesomeIcon icon={faUser} />&nbsp; {/* 사람 아이콘 추가 */}
-            {bankDetails.g_name} &nbsp; {/* 작성자 이름 */}
+            관리자 &nbsp; {/* 작성자 이름 */}
           </span>
-          <span className="created-date">작성일: {bankDetails.g_createdAt}</span> {/* 작성일 표시 */}
+          <span className="created-date">
+            작성일: {new Date(bankDetails.createdAt).toLocaleDateString()}</span>
         </div>
 
         <div className="detail-header">

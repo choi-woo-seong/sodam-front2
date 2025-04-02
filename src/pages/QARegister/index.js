@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const QARegister = () => {
-    const navigate = useNavigate();
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const navigate = useNavigate();
   
   // Q&A 등록 폼 데이터 상태
   const [formData, setFormData] = useState({
@@ -13,11 +14,7 @@ const QARegister = () => {
 
   // 각 입력 필드에 대한 오류 메시지를 저장하는 상태 변수
   const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState("");
-  
-
-  // 중복 확인 상태
-  const [isDuplicate, setIsDuplicate] = useState(false);
+  const [message, setMessage] = useState("");
 
   // 각 입력 필드에 대한 ref 생성
   const refs = {
@@ -29,9 +26,6 @@ const QARegister = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-
-
 
   // 폼 유효성 검사 함수
   const validateForm = () => {
@@ -51,22 +45,28 @@ const QARegister = () => {
 
   const handleQAInsert = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    // 유효성 검사
+    if (!validateForm()) {
+      alert("빈칸을 확인해주세요."); // 빈칸이 있을 경우 얼럿 메시지 표시 
+      return; // 유효성 검사 실패 시 더 이상 진행하지 않음
+    }
+
     const token = localStorage.getItem("jwt"); // JWT 토큰 가져오기
 
     if (!token) {
-      setMessage("로그인이 필요합니다.");
+      alert("로그인이 필요합니다.");
       return;
     }
 
     try {
-      // FormData 객체로 폼 데이터와 파일을 전송
+      // FormData 객체로 폼 데이터 전송
       const formDataToSend = {
         title: formData.title,
         content: formData.content,
       };
- 
-      const response = await fetch("http://192.168.0.102:8080/api/question/create", {
+
+      const response = await fetch(`${BASE_URL}/api/question/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`, // JWT 토큰 포함
@@ -84,20 +84,17 @@ const QARegister = () => {
         title: "",
         content: "",
       });
-      navigate("/QABoardList");
-    } catch (error) {
-      setErrors(error.message);
-      console.error(" 등록 오류:", error);
-    }
-  };
-  
-  // 폼 제출 시 호출되는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
+
+      // 성공 시 alert 표시
       alert("등록되었습니다.");
-    } else {
-      alert("빈칸을 확인해주세요.");
+      navigate("/QABoardList");
+
+    } catch (error) {
+      setErrors({ message: error.message }); // 오류 메시지를 상태에 설정
+      console.error("등록 오류:", error);
+
+      // 등록 실패 시 바로 alert 표시
+      alert("등록 실패: " + error.message); // 실패 시 alert 표시
     }
   };
 
@@ -136,8 +133,7 @@ const QARegister = () => {
         </div>
 
         {/* 제출 버튼 */}
-        <button className="register-submit" type="submit"
-         onClick={handleQAInsert} >
+        <button className="register-submit" type="button" onClick={handleQAInsert}>
           등록
         </button>
       </div>
