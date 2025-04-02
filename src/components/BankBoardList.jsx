@@ -6,7 +6,9 @@ const BankBoardList = () => {
   const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const [data, setData] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [errors, setErrors] = useState("");
+  // eslint-disable-next-line no-unused-vars
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const BankBoardList = () => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 현재 페이지를 관리하는 state
