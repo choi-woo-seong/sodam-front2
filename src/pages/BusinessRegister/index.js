@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
 const BusinessRegister = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+ 
 
   const navigate = useNavigate();
 
@@ -94,7 +94,7 @@ const BusinessRegister = () => {
 
     console.log(formDataToSend);
 
-    fetch(`${BASE_URL}/api/biz/create`, {
+    fetch("/api/biz/create", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,

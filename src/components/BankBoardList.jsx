@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const BankBoardList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
 
   const [data, setData] = useState([]);
   // eslint-disable-next-line no-unused-vars
@@ -14,7 +14,7 @@ const BankBoardList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/gov/searchAll`, {
+        const response = await fetch("/api/gov/searchAll", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

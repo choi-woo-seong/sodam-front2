@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Signup.css";
 
 const Signup = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
 
   const navigate = useNavigate();
 
@@ -114,7 +114,7 @@ const validatePhoneNumber = (phoneNumber) => {
       email: formData.email,
     };
     console.log(payload);
-    fetch(`${BASE_URL}/email/send-code`, {
+    fetch("/api/email/send-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const validatePhoneNumber = (phoneNumber) => {
       code: verificationCode,
     };
     console.log(payload);
-    fetch(`${BASE_URL}/email/verify-code`, {
+    fetch("/api/email/verify-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -189,7 +189,7 @@ const validatePhoneNumber = (phoneNumber) => {
       email: formData1.b_email,
     };
     console.log(payload);
-    fetch(`${BASE_URL}/email/send-code`, {
+    fetch("/api/email/send-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -222,7 +222,7 @@ const validatePhoneNumber = (phoneNumber) => {
       code: verificationCode,
     };
     console.log(payload);
-    fetch(`${BASE_URL}/email/verify-code`, {
+    fetch("/api/email/verify-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -384,7 +384,7 @@ const handleNomalSingup = (e) => {
       phone2: formData.phone2,
     };
 
-    fetch(`${BASE_URL}/auth/register/nuser`, {
+    fetch("/api/auth/register/nuser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -426,7 +426,7 @@ const handleSingup = (e) => {
   }
 
   if (validateForm1()) { // 유효성 검사 후, 오류가 없으면 회원가입 진행
-    fetch(`${BASE_URL}/auth/register/buser`, {
+    fetch("/api/auth/register/buser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -471,7 +471,7 @@ const handleSingup = (e) => {
       return;
     }
 
-    const url = `${BASE_URL}/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
+    const url = `/api/users/check-duplicate?nUserid=${encodeURIComponent(formData.n_userid)}`;
 
     fetch(url, {
       method: "GET",
@@ -511,7 +511,7 @@ const handleSingup = (e) => {
       return;
     }
 
-    const url = `${BASE_URL}/api/users/check-duplicate2?userid=${encodeURIComponent(formData1.userid)}`;
+    const url = `/api/users/check-duplicate2?userid=${encodeURIComponent(formData1.userid)}`;
 
     fetch(url, {
       method: "GET",

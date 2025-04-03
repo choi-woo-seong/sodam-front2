@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const NoticeRegister = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
   
@@ -65,7 +64,7 @@ const NoticeRegister = () => {
         n_content: formData.n_content,
       };
 
-      const response = await fetch(`${BASE_URL}/api/notice/create`, {
+      const response = await fetch("/api/notice/create", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

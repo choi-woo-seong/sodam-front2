@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const BookMarkBoardList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+ 
 
 const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
@@ -21,7 +21,7 @@ useEffect(() => {
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/api/bookmark/mapped`, {
+      const response = await fetch("/api/bookmark/mapped", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,

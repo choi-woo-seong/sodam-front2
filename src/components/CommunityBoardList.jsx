@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const CommunityBoardList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
 
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
@@ -19,7 +19,7 @@ const CommunityBoardList = () => {
           return;
         }
 
-        const response = await fetch(`${BASE_URL}/api/community/searchAll`, {
+        const response = await fetch("/api/community/searchAll", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const CommunityUpdate = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const [formData, setFormData] = useState({
     c_title: "",
@@ -23,7 +22,7 @@ const CommunityUpdate = () => {
   useEffect(() => {
     const fetchCommunityDetails = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/community/communityDetail/${id}`);
+        const response = await fetch(`/api/community/communityDetail/${id}`);
         if (!response.ok) throw new Error("게시글 조회 실패");
 
         const data = await response.json();
@@ -62,7 +61,7 @@ const CommunityUpdate = () => {
 
     if (validateForm()) {
       const token = localStorage.getItem("jwt");
-      fetch(`${BASE_URL}/api/community/update/${id}`, {
+      fetch(`/api/community/update/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,7 +91,7 @@ const CommunityUpdate = () => {
   const handleCommunityDelete = () => {
     if (window.confirm("정말로 이 글을 삭제하시겠습니까?")) {
       const token = localStorage.getItem("jwt");
-      fetch(`${BASE_URL}/api/community/delete/${id}`, {
+      fetch(`/api/community/delete/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

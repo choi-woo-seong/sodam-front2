@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import "./login.css";
 
 const BusinessLogin = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +39,7 @@ const BusinessLogin = () => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/login/buser`, {
+      const response = await fetch("/api/auth/login/buser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

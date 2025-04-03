@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const ProductBoardList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
 
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
@@ -21,7 +21,7 @@ const ProductBoardList = () => {
           return;
         }
 
-        const response = await fetch(`${BASE_URL}/api/products/searchAll`, {
+        const response = await fetch("/api/products/searchAll", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

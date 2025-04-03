@@ -4,7 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import "../styles/WriteBoardList.css";
 
 const PersonWriteList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  
 
   const navigate = useNavigate();
 
@@ -67,7 +67,7 @@ const PersonWriteList = () => {
             return;
           }
   
-          const response = await fetch(`${BASE_URL}/mypage/posts`, {
+          const response = await fetch("/api/mypage/posts", {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${token}`,
