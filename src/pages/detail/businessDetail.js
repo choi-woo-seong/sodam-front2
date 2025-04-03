@@ -27,7 +27,7 @@ function BusinessDetail() {
   useEffect(() => {
     const fetchBusinessDetails = async () => {
       try {
-        const response = await fetch("/api/biz/businessDetail/${id}");
+        const response = await fetch(`/api/biz/businessDetail/${id}`);
         if (!response.ok) {
           throw new Error("비즈니스 데이터 조회에 실패했습니다.");
         }

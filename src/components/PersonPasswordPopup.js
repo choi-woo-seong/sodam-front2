@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import Modal from "../components/modal.js";
 
 function PasswordPopup() {
-    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
-
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +22,7 @@ function PasswordPopup() {
 
         try {
             const token = localStorage.getItem("jwt"); // 토큰 가져오기
-            const response = await fetch(`${BASE_URL}/api/users/normal/password`, {
+            const response = await fetch("/api/users/normal/password", {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,

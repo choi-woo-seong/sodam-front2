@@ -29,7 +29,7 @@ function Main({ apiEndpoints }) {
       return;
     }
 
-    fetch("/api/search/all?title=${encodeURIComponent(searchTerm)}")
+    fetch(`/api/search/all?title=${encodeURIComponent(searchTerm)}`)
       .then((res) => res.json())
       .then((data) => {
         setSuggestions(data); // 연관 검색어 업데이트

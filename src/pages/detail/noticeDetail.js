@@ -34,7 +34,7 @@ function NoticeDetail() {
     // 상품 데이터 API 호출 (예시로 제품 정보 호출)
     const fetchNoticeDetails = async () => {
       try {
-        const response = await fetch("/api/notice/noticeDetail/${id}"); // 예시 API URL
+        const response = await fetch(`/api/notice/noticeDetail/${id}`); // 예시 API URL
         if (!response.ok) {
           throw new Error("공지 데이터 조회에 실패했습니다.");
         }

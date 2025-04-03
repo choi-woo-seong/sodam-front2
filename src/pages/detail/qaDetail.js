@@ -43,7 +43,7 @@ function QADetail() {
   const handleUpdateComment = async (id) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch("/api/answer/update/${id}", {
+      const response = await fetch(`/api/answer/update/${id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -68,7 +68,7 @@ function QADetail() {
   const handleDeleteComment = async (id) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch("/api/answer/delete/${id}", {
+      const response = await fetch(`/api/answer/delete/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}`,
                   "Content-Type": "application/json", 
@@ -142,7 +142,7 @@ function QADetail() {
   // API에서 상품 상세 데이터 가져오기
   const fetchAnswerSelecte = async () => {
     try {
-      const response = await fetch("/api/answer/byQuestion/${id}"); // 예시 API URL
+      const response = await fetch(`/api/answer/byQuestion/${id}`); // 예시 API URL
       if (!response.ok) {
         throw new Error("데이터 조회에 실패했습니다.");
       }
@@ -167,7 +167,7 @@ function QADetail() {
   useEffect(() => {
     const fetchQADetails = async () => {
       try {
-        const response = await fetch("/api/question/questionDetail/${id}"); // 예시 API URL
+        const response = await fetch(`/api/question/questionDetail/${id}`); // 예시 API URL
         if (!response.ok) {
           throw new Error("데이터 조회에 실패했습니다.");
         }

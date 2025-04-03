@@ -34,7 +34,7 @@ function ProductDetail() {
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   const fetchProductDetails = async () => {
     try {
-      const response = await fetch("/api/products/productDetail/${id}"); // 예시 API URL
+      const response = await fetch(`/api/products/productDetail/${id}`); // 예시 API URL
       if (!response.ok) {
         throw new Error("상품 데이터 조회에 실패했습니다.");
       }

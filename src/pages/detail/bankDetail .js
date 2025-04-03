@@ -85,7 +85,7 @@ const [bankDetails, setBankDetails] = useState({
    // 상품 데이터 API 호출 (예시로 제품 정보 호출)
   const fetchBankDetails = async () => {
   try {
-    const response = await fetch("/api/gov/govDetail/${id}"); // 예시 API URL
+    const response = await fetch(`/api/gov/govDetail/${id}`); // 예시 API URL
     if (!response.ok) {
       throw new Error("금융 데이터 조회에 실패했습니다.");
     }

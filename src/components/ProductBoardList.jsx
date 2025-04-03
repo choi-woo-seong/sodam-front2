@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const ProductBoardList = () => {
-  
-
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState("");
   const [message, setMessage] = useState("");
