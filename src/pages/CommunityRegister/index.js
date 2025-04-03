@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CommunityRegister = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
 
@@ -65,7 +64,7 @@ const CommunityRegister = () => {
         c_content: formData.c_content,
       };
 
-      const response = await fetch(`${BASE_URL}/api/community/create`, {
+      const response = await fetch("/api/community/create", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

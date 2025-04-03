@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProductRegister = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
   
@@ -103,7 +102,7 @@ const ProductRegister = () => {
         p_link: formData.p_link,
       };
   
-      const response = await fetch(`${BASE_URL}/api/products/create`, {
+      const response = await fetch("/api/products/create", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
