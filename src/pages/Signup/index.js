@@ -368,10 +368,10 @@ const handleNomalSingup = (e) => {
     return;
   }
 
-  if (isVerificationCodeValid === false) {
-    alert("이메일 인증을 해주세요");
-    return;
-  }
+  // if (isVerificationCodeValid === false) {
+  //   alert("이메일 인증을 해주세요");
+  //   return;
+  // }
 
   if (validateForm()) {  // 유효성 검사 추가
     const payload = {
@@ -420,10 +420,10 @@ const handleSingup = (e) => {
     return;
   }
 
-  if (isVerificationCodeValid === false) {
-    alert("이메일 인증을 해주세요");
-    return;
-  }
+  // if (isVerificationCodeValid === false) {
+  //   alert("이메일 인증을 해주세요");
+  //   return;
+  // }
 
   if (validateForm1()) { // 유효성 검사 후, 오류가 없으면 회원가입 진행
     fetch("/api/auth/register/buser", {
@@ -618,9 +618,9 @@ const handleSingup = (e) => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
-          <button type="button" onClick={handleEmailCheck}>
+          {/* <button type="button" onClick={handleEmailCheck}>
             이메일 인증
-          </button>
+          </button> */}
         </div>
 
         {/* 이메일 인증 번호 입력 필드가 나타나도록 */}
@@ -759,9 +759,9 @@ const handleSingup = (e) => {
             value={formData1.b_email}
             onChange={(e) => setFormData1({ ...formData1, b_email: e.target.value })}
           />
-          <button type="button" onClick={handleEmailCheck1}>
+          {/* <button type="button" onClick={handleEmailCheck1}>
             이메일 인증
-          </button>
+          </button> */}
         </div>
 
         {/* 이메일 인증 번호 입력 필드가 나타나도록 */}
