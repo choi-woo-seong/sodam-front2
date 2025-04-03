@@ -5,7 +5,6 @@ import { faBookmark, faUser } from "@fortawesome/free-solid-svg-icons";
 import "./detail.css";
 
 function BusinessDetail() {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
   const { id } = useParams(); // URL에서 productId 파라미터 가져오기
@@ -28,7 +27,7 @@ function BusinessDetail() {
   useEffect(() => {
     const fetchBusinessDetails = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/biz/businessDetail/${id}`);
+        const response = await fetch("/api/biz/businessDetail/${id}");
         if (!response.ok) {
           throw new Error("비즈니스 데이터 조회에 실패했습니다.");
         }
@@ -70,7 +69,7 @@ function BusinessDetail() {
         targetPgm:"businessDetail",
       };
 
-      const response = await fetch(`${BASE_URL}/api/bookmark/check`, {
+      const response = await fetch("/api/bookmark/check", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -113,7 +112,7 @@ function BusinessDetail() {
 
         console.log(formDataToSend)
     
-        const response = await fetch(`${BASE_URL}/api/bookmark/toggle`, {
+        const response = await fetch("/api/bookmark/toggle", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

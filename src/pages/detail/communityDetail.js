@@ -6,7 +6,6 @@ import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./detail.css";
 
 function CommunityDetail() {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const [c_comments, setComments] = useState([]); // 댓글 목록
   const [c_comment, setComment] = useState(""); // 댓글 입력 상태
@@ -55,7 +54,7 @@ function CommunityDetail() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/byCommunity/${id}`);
+      const response = await fetch("/api/comment/byCommunity/${id}");
       if (!response.ok) throw new Error("댓글 조회 실패");
 
       const result = await response.json();
@@ -68,7 +67,7 @@ function CommunityDetail() {
 
   const fetchCommunityDetails = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/community/communityDetail/${id}`);
+      const response = await fetch("/api/community/communityDetail/${id}");
       if (!response.ok) throw new Error("게시글 조회 실패");
 
       const data = await response.json();
@@ -94,7 +93,7 @@ function CommunityDetail() {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/create`, {
+      const response = await fetch("/api/comment/create", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +128,7 @@ function CommunityDetail() {
   const handleUpdateComment = async (commentId) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch(`${BASE_URL}/api/comment/update/${commentId}`, {
+      const response = await fetch("/api/comment/update/${commentId}", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -151,7 +150,7 @@ function CommunityDetail() {
   const handleDeleteComment = async (commentId) => {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch(`${BASE_URL}/api/comment/delete/${commentId}`, {
+      const response = await fetch("/api/comment/delete/${commentId}", {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
