@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../styles/BoardList.css";
 
 const QABoardList = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+ 
 
   const [data, setData] = useState([]);
     const [errors, setErrors] = useState("");
@@ -19,7 +19,7 @@ const QABoardList = () => {
             return;
           }
   
-          const response = await fetch(`${BASE_URL}/api/question/searchAll`, {
+          const response = await fetch("/api/question/searchAll", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
