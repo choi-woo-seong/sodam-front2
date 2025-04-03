@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 import "./login.css";
 
 const PersonLogin = () => {
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,7 +37,7 @@ const PersonLogin = () => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/login/nuser`, {
+      const response = await fetch("/api/auth/login/nuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
