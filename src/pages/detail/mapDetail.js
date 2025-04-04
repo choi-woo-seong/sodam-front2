@@ -49,9 +49,7 @@ function MapDetail() {
             alert("주소를 찾을 수 없습니다."); // 주소가 없을 경우 오류 처리
           }
         });
-      } else {
-        alert("주소가 제공되지 않았습니다."); // 주소가 없다면 경고 처리
-      }
+      } 
     }
   }, [state?.address]); // state.address가 변경될 때마다 리렌더링
 
